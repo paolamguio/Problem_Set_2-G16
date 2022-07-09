@@ -25,7 +25,8 @@ p_load(
   modelsummary,
   gamlr,
   ROCR,
-  pROC
+  pROC,
+  smotefamily
 )
 
 ## se importan bases de datos creada en 2.data_cleaning
@@ -89,3 +90,259 @@ logit <- train(
   family = "binomial",
   preProcess = c("center", "scale")
 )
+
+logit
+
+logit2 <- train(
+  model2,
+  data = training,
+  method = "glm",
+  trControl = ctrl,
+  family = "binomial",
+  preProcess = c("center", "scale")
+)
+
+logit2
+
+lambda_grid <- 10^seq(-4, 0.01, length = 300)
+
+set.seed(1410)
+
+logit_lasso <- train(
+  model,
+  data = training,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso
+
+logit_lasso2 <- train(
+  model2,
+  data = training,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso2
+
+logit_ridge <- train(
+  model,
+  data = training,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge
+
+logit_ridge2 <- train(
+  model2,
+  data = training,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge2
+
+set.seed(1103)
+
+upSampledTrain <- upSample(x = training,
+                           y = training$Pobre,
+                           yname = "Pobre")
+
+table(upSampledTrain$Pobre)
+
+set.seed(1410)
+
+logit_lasso_upsample <- train(
+  model,
+  data = upSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso_upsample
+
+logit_lasso_upsample2 <- train(
+  model2,
+  data = upSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso_upsample2
+
+logit_ridge_upsample <- train(
+  model,
+  data = upSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge_upsample
+
+logit_ridge_upsample2 <- train(
+  model2,
+  data = upSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge_upsample2
+
+set.seed(1103)
+
+downSampledTrain <- downSample(x = training,
+                               y = training$Pobre,
+                               yname = "Pobre")
+
+table(downSampledTrain$Pobre)
+
+set.seed(1410)
+
+logit_lasso_downsample <- train(
+  model,
+  data = downSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso_downsample
+
+logit_lasso_downsample2 <- train(
+  model2,
+  data = downSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso_downsample2
+
+logit_ridge_downsample <- train(
+  model,
+  data = downSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge_downsample
+
+logit_ridge_downsample2 <- train(
+  model2,
+  data = downSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge_downsample2
+
+predictors <- c("Dominio", "tipo_vivienda", "Nro_personas_cuartos", "cuota_amortizacion", "arriendo", "edad_promedio", "jefe_hogar_mujer", "Nro_hijos", "edu_promedio", "horas_trabajadas_promedio", "porcentaje_mujeres", "porcentaje_trabajo_formal", "porcentaje_subsidio_familiar", "segundo_trabajo", "otros_ingresos", "otros_ingresos_instituciones", "tasa_ocupacion", "tasa_desempleo", "tasa_participacion")
+
+smote_output = SMOTE(X = training[predictors],
+                     target = training$Pobre)
+
+oversampled_data <- smote_output$data
+
+table(oversampled_data$Pobre)
+
+set.seed(1410)
+
+logit_lasso_smote <- train(
+  model,
+  data = oversampled_data,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso_smote
+
+logit_lasso_smote2 <- train(
+  model2,
+  data = oversampled_data,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso_smote2
+
+logit_ridge_smote <- train(
+  model,
+  data = oversampled_data,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge_smote
+
+logit_ridge_smote2 <- train(
+  model2,
+  data = oversampled_data,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge_smote2
