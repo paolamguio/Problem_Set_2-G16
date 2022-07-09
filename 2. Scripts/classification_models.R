@@ -1,5 +1,15 @@
-rm(list = ls())
 
+# Clasificación de modelos 
+# Problem_Set_2 
+# Grupo 16
+# Andres Martinez, Paola Morales y Oscar Cortes 
+--------------------------------------------------
+  
+## preparación del espacio
+rm(list = ls())
+setwd("C:/Users/amorales/OneDrive - ANI/Documentos/GitHub/Problem_Set_2-G16/3. Stores")
+
+## llamado librerías de la sesión
 require(pacman)
 p_load(
   tidyverse,
@@ -18,31 +28,33 @@ p_load(
   pROC
 )
 
+## se importan bases de datos creada en 2.data_cleaning
 df_hogares <- import("df_hogares.rds")
 
 df_hogares <- df_hogares %>% select(c("id", "Dominio", "Nper", "Lp", "Pobre", "tipo_vivienda", "Nro_cuartos", "Nro_personas_cuartos", "cuota_amortizacion", "arriendo", "Nro_mujeres", "edad_promedio", "jefe_hogar_mujer", "Nro_hijos", "edu_promedio", "horas_trabajadas_promedio", "Ingtotob_hogar", "porcentaje_mujeres", "porcentaje_trabajo_formal", "porcentaje_subsidio_familiar", "segundo_trabajo", "otros_ingresos", "otros_ingresos_instituciones", "tasa_ocupacion", "tasa_desempleo", "tasa_inactivas", "tasa_participacion"))
 
 summary(df_hogares)
 
+#Creación de variable
 df_hogares <- df_hogares %>% mutate(edad_promedio2 = edad_promedio^2)
 
 prop.table(table(df_hogares$Pobre))
 
+### 1.Partición de la base en tres ###
+
 set.seed(156)
 
 split1 <- createDataPartition(df_hogares$Pobre , p = 0.7)[[1]]
-
 training = df_hogares[split1,]
-
 other <- df_hogares[-split1,]
 
+# Creación de bases de evaluación y testeo 
 set.seed(934)
 
 split2 <- createDataPartition(other$Pobre , p = 1/3)[[1]]
-
 evaluation <- other[split2,]
-
 testing <- other[-split2,]
+
 
 prop.table(table(training$Pobre))
 
