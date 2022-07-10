@@ -468,3 +468,75 @@ rfROC_logit_lasso_smote2 <- roc(evalResults$Pobre, evalResults$Roc_logit_lasso_s
 rfROC_logit_ridge_smote <- roc(evalResults$Pobre, evalResults$Roc_logit_ridge_smote, levels = rev(levels(evalResults$Pobre)))
 
 rfROC_logit_ridge_smote2 <- roc(evalResults$Pobre, evalResults$Roc_logit_ridge_smote2, levels = rev(levels(evalResults$Pobre)))
+
+rfThresh_logit <- coords(rfROC_logit, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit
+
+rfThresh_logit2 <- coords(rfROC_logit2, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit2
+
+rfThresh_logit_lasso <- coords(rfROC_logit_lasso, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_lasso
+
+rfThresh_logit_lasso2 <- coords(rfROC_logit_lasso2, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_lasso2
+
+rfThresh_logit_ridge <- coords(rfROC_logit_ridge, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_ridge
+
+rfThresh_logit_ridge2 <- coords(rfROC_logit_ridge2, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_ridge2
+
+rfThresh_logit_lasso_upsample <- coords(rfROC_logit_lasso_upsample, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_lasso_upsample
+
+rfThresh_logit_lasso_upsample2 <- coords(rfROC_logit_lasso_upsample2, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_lasso_upsample2
+
+rfThresh_logit_ridge_upsample <- coords(rfROC_logit_ridge_upsample, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_ridge_upsample
+
+rfThresh_logit_ridge_upsample2 <- coords(rfROC_logit_ridge_upsample2, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_ridge_upsample2
+
+rfThresh_logit_lasso_downsample <- coords(rfROC_logit_lasso_downsample, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_lasso_downsample
+
+rfThresh_logit_lasso_downsample2 <- coords(rfROC_logit_lasso_downsample2, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_lasso_downsample2
+
+rfThresh_logit_ridge_downsample <- coords(rfROC_logit_ridge_downsample, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_ridge_downsample
+
+rfThresh_logit_ridge_downsample2 <- coords(rfROC_logit_ridge_downsample2, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_ridge_downsample2
+
+rfThresh_logit_lasso_smote <- coords(rfROC_logit_lasso_smote, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_lasso_smote
+
+rfThresh_logit_lasso_smote2 <- coords(rfROC_logit_lasso_smote2, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_lasso_smote2
+
+rfThresh_logit_ridge_smote <- coords(rfROC_logit_ridge_smote, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_ridge_smote
+
+rfThresh_logit_ridge_smote2 <- coords(rfROC_logit_ridge_smote2, x = "best", best.method = "closest.topleft")
+
+rfThresh_logit_ridge_smote2
