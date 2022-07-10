@@ -33,7 +33,6 @@ p_load(
 df_hogares <- import("df_hogares.rds") 
 
 ### 2. Ajustes base de datos ###
-
 df_hogares <- df_hogares %>% select(c("id", "Dominio", "Nper", "Lp", "Pobre", "tipo_vivienda", "Nro_cuartos", "Nro_personas_cuartos", "cuota_amortizacion", "arriendo", "Nro_mujeres", "edad_promedio", "jefe_hogar_mujer", "Nro_hijos", "edu_promedio", "horas_trabajadas_promedio", "Ingtotob_hogar", "porcentaje_mujeres", "porcentaje_trabajo_formal", "porcentaje_subsidio_familiar", "segundo_trabajo", "otros_ingresos", "otros_ingresos_instituciones", "tasa_ocupacion", "tasa_desempleo", "tasa_inactivas", "tasa_participacion"))
 summary(df_hogares)
 
@@ -43,10 +42,10 @@ df_hogares <- df_hogares %>% mutate(edad_promedio2 = edad_promedio^2)
 prop.table(table(df_hogares$Pobre))
 
 ### 3.Partición base de datos en tres ###
-
 # base de datos de entrenamiento
 set.seed(156)
 split1 <- createDataPartition(df_hogares$Pobre , p = 0.7)[[1]]
+length(split1)
 training = df_hogares[split1,]
 other <- df_hogares[-split1,]
 
@@ -56,6 +55,9 @@ split2 <- createDataPartition(other$Pobre , p = 1/3)[[1]]
 evaluation <- other[split2,]
 testing <- other[-split2,]
 
+dim(training)
+dim(testing)
+dim(evaluation)
 
 prop.table(table(training$Pobre))
 prop.table(table(testing$Pobre))
@@ -71,6 +73,8 @@ model2 <- as.formula("Pobre ~ tipo_vivienda + Dominio + Nro_personas_cuartos + c
 
 fiveStats <- function(...) c(twoClassSummary(...), defaultSummary(...))
 
+### 4. Modelos de predicción ###
+
 ctrl<- trainControl(method = "cv",
                     number = 5,
                     summaryFunction = fiveStats,
@@ -78,8 +82,10 @@ ctrl<- trainControl(method = "cv",
                     verbose=FALSE,
                     savePredictions = T)
 
-set.seed(1410)
 
+## 4.1. Modelo Logit - datos de entrenamiento ###
+
+set.seed(1410)
 logit <- train(
   model,
   data = training,
@@ -101,6 +107,8 @@ logit2 <- train(
 )
 
 logit2
+
+## 4.2. Modelo lasso - datos de entrenamiento ###
 
 lambda_grid <- 10^seq(-4, 0.01, length = 300)
 
@@ -132,6 +140,8 @@ logit_lasso2 <- train(
 
 logit_lasso2
 
+## 4.3. Modelo logit ridge - datos de entrenamiento ###
+
 logit_ridge <- train(
   model,
   data = training,
@@ -157,6 +167,8 @@ logit_ridge2 <- train(
 )
 
 logit_ridge2
+
+## 4.4. Modelo logit lasso up sample - datos de entrenamiento ###
 
 set.seed(1103)
 
@@ -344,3 +356,5 @@ logit_ridge_smote2 <- train(
 )
 
 logit_ridge_smote2
+
+### 5. Evaluación de resultados ###
