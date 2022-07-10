@@ -1,0 +1,346 @@
+
+# Clasificación de modelos 
+# Problem_Set_2 
+# Grupo 16
+# Andres Martinez, Paola Morales y Oscar Cortes 
+--------------------------------------------------
+  
+## preparación del espacio
+rm(list = ls())
+setwd("C:/Users/amorales/OneDrive - ANI/Documentos/GitHub/Problem_Set_2-G16/3. Stores")
+
+## llamado librerías de la sesión
+require(pacman)
+p_load(
+  tidyverse,
+  rvest,
+  writexl,
+  rio,
+  skimr,
+  pastecs,
+  PerformanceAnalytics,
+  naniar,
+  gtsummary,
+  caret,
+  modelsummary,
+  gamlr,
+  ROCR,
+  pROC,
+  smotefamily
+)
+
+### 1. llamado base de datos creada en 2.data_cleaning2.R ###
+df_hogares <- import("df_hogares.rds") 
+
+### 2. Ajustes base de datos ###
+
+df_hogares <- df_hogares %>% select(c("id", "Dominio", "Nper", "Lp", "Pobre", "tipo_vivienda", "Nro_cuartos", "Nro_personas_cuartos", "cuota_amortizacion", "arriendo", "Nro_mujeres", "edad_promedio", "jefe_hogar_mujer", "Nro_hijos", "edu_promedio", "horas_trabajadas_promedio", "Ingtotob_hogar", "porcentaje_mujeres", "porcentaje_trabajo_formal", "porcentaje_subsidio_familiar", "segundo_trabajo", "otros_ingresos", "otros_ingresos_instituciones", "tasa_ocupacion", "tasa_desempleo", "tasa_inactivas", "tasa_participacion"))
+summary(df_hogares)
+
+#Creación de variable
+df_hogares <- df_hogares %>% mutate(edad_promedio2 = edad_promedio^2)
+
+prop.table(table(df_hogares$Pobre))
+
+### 3.Partición base de datos en tres ###
+
+# base de datos de entrenamiento
+set.seed(156)
+split1 <- createDataPartition(df_hogares$Pobre , p = 0.7)[[1]]
+training = df_hogares[split1,]
+other <- df_hogares[-split1,]
+
+# Creación de bases de evaluación y testeo 
+set.seed(934)
+split2 <- createDataPartition(other$Pobre , p = 1/3)[[1]]
+evaluation <- other[split2,]
+testing <- other[-split2,]
+
+
+prop.table(table(training$Pobre))
+prop.table(table(testing$Pobre))
+prop.table(table(evaluation$Pobre))
+
+predict <- stats::predict
+
+colnames(training)
+
+### 4.se definen dos modelos con distintas variables de interes ###
+model <- as.formula("Pobre ~ tipo_vivienda + Dominio + Nro_personas_cuartos + cuota_amortizacion + arriendo + edad_promedio + jefe_hogar_mujer + Nro_hijos + edu_promedio + horas_trabajadas_promedio + porcentaje_mujeres + porcentaje_trabajo_formal + porcentaje_subsidio_familiar + segundo_trabajo + otros_ingresos + otros_ingresos_instituciones + tasa_ocupacion + tasa_desempleo + tasa_participacion")
+model2 <- as.formula("Pobre ~ tipo_vivienda + Dominio + Nro_personas_cuartos + cuota_amortizacion + arriendo + edad_promedio + edad_promedio:porcentaje_mujeres + jefe_hogar_mujer + Nro_hijos + Nro_hijos:porcentaje_mujeres + edu_promedio + edu_promedio:porcentaje_mujeres + edu_promedio:Dominio + edu_promedio:jefe_hogar_mujer + horas_trabajadas_promedio + horas_trabajadas_promedio:porcentaje_mujeres + horas_trabajadas_promedio:jefe_hogar_mujer + porcentaje_mujeres + porcentaje_trabajo_formal + porcentaje_subsidio_familiar + segundo_trabajo + otros_ingresos + otros_ingresos_instituciones + tasa_ocupacion + tasa_desempleo + tasa_participacion")
+
+fiveStats <- function(...) c(twoClassSummary(...), defaultSummary(...))
+
+ctrl<- trainControl(method = "cv",
+                    number = 5,
+                    summaryFunction = fiveStats,
+                    classProbs = TRUE,
+                    verbose=FALSE,
+                    savePredictions = T)
+
+set.seed(1410)
+
+logit <- train(
+  model,
+  data = training,
+  method = "glm",
+  trControl = ctrl,
+  family = "binomial",
+  preProcess = c("center", "scale")
+)
+
+logit
+
+logit2 <- train(
+  model2,
+  data = training,
+  method = "glm",
+  trControl = ctrl,
+  family = "binomial",
+  preProcess = c("center", "scale")
+)
+
+logit2
+
+lambda_grid <- 10^seq(-4, 0.01, length = 300)
+
+set.seed(1410)
+
+logit_lasso <- train(
+  model,
+  data = training,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso
+
+logit_lasso2 <- train(
+  model2,
+  data = training,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso2
+
+logit_ridge <- train(
+  model,
+  data = training,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge
+
+logit_ridge2 <- train(
+  model2,
+  data = training,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge2
+
+set.seed(1103)
+
+upSampledTrain <- upSample(x = training,
+                           y = training$Pobre,
+                           yname = "Pobre")
+
+table(upSampledTrain$Pobre)
+
+set.seed(1410)
+
+logit_lasso_upsample <- train(
+  model,
+  data = upSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso_upsample
+
+logit_lasso_upsample2 <- train(
+  model2,
+  data = upSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso_upsample2
+
+logit_ridge_upsample <- train(
+  model,
+  data = upSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge_upsample
+
+logit_ridge_upsample2 <- train(
+  model2,
+  data = upSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge_upsample2
+
+set.seed(1103)
+
+downSampledTrain <- downSample(x = training,
+                               y = training$Pobre,
+                               yname = "Pobre")
+
+table(downSampledTrain$Pobre)
+
+set.seed(1410)
+
+logit_lasso_downsample <- train(
+  model,
+  data = downSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso_downsample
+
+logit_lasso_downsample2 <- train(
+  model2,
+  data = downSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso_downsample2
+
+logit_ridge_downsample <- train(
+  model,
+  data = downSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge_downsample
+
+logit_ridge_downsample2 <- train(
+  model2,
+  data = downSampledTrain,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge_downsample2
+
+predictors <- c("Dominio", "tipo_vivienda", "Nro_personas_cuartos", "cuota_amortizacion", "arriendo", "edad_promedio", "jefe_hogar_mujer", "Nro_hijos", "edu_promedio", "horas_trabajadas_promedio", "porcentaje_mujeres", "porcentaje_trabajo_formal", "porcentaje_subsidio_familiar", "segundo_trabajo", "otros_ingresos", "otros_ingresos_instituciones", "tasa_ocupacion", "tasa_desempleo", "tasa_participacion")
+
+smote_output = SMOTE(X = training[predictors],
+                     target = training$Pobre)
+
+oversampled_data <- smote_output$data
+
+table(oversampled_data$Pobre)
+
+set.seed(1410)
+
+logit_lasso_smote <- train(
+  model,
+  data = oversampled_data,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso_smote
+
+logit_lasso_smote2 <- train(
+  model2,
+  data = oversampled_data,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_lasso_smote2
+
+logit_ridge_smote <- train(
+  model,
+  data = oversampled_data,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge_smote
+
+logit_ridge_smote2 <- train(
+  model2,
+  data = oversampled_data,
+  method = "glmnet",
+  trControl = ctrl,
+  family = "binomial",
+  metric = "Spec",
+  tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
+  preProcess = c("center", "scale")
+)
+
+logit_ridge_smote2
