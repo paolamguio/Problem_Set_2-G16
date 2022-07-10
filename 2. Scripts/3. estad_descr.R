@@ -11,7 +11,6 @@ setwd("C:/Users/amorales/OneDrive - ANI/Documentos/GitHub/Problem_Set_2-G16/3. S
 
 ## llamado librerías de la sesión
 require(pacman)
-require(gtsummary)
 
 p_load(
   tidyverse,
@@ -20,27 +19,84 @@ p_load(
   rio,
   skimr,
   pastecs,
-  stargazer
+  stargazer,
+  PerformanceAnalytics,
+  naniar
 )
 
 ## se importan bases de datos creada en 2.data_cleaning
 df_hogares<- readRDS("df_hogares.rds")
 dim(df_hogares)
 colnames(df_hogares)
+prop.table(table(df_hogares$Pobre)) #20% pobres y 80% no pobre
+
+## Se seleccionan variables de interes
+df <- df_hogares %>% select(c("Pobre", "Nper", "Nro_personas_trabajo_formal", "tipo_vivienda", "Dominio", "Nro_personas_cuartos", "cuota_amortizacion", "arriendo", "edad_promedio", "jefe_hogar_mujer", "Nro_hijos", "edu_promedio", "horas_trabajadas_promedio", "porcentaje_mujeres", "porcentaje_trabajo_formal", "porcentaje_subsidio_familiar", "segundo_trabajo", "otros_ingresos", "otros_ingresos_instituciones", "tasa_ocupacion", "tasa_desempleo", "tasa_participacion", "Ingtotob_hogar"))
+
 
 ### 1. estadísticas descriptivas ###
-tbl_summary(df_hogares)
+summary(df)
 
-summary(df_hogares)
+# estadísticas descriptivas variables de interes
+require(gtsummary) #llamado librería
+# estadísiticas descriptivas generales datos
+stat.desc(df)
+descriptivas <- stat.desc(df) # se guardan las estadísticas descriptivas de todas las variables para luego exportarlas a un excel
+descriptivas$Estadisticas <- row.names(descriptivas) # se crea columna dentro del dataframe con el nombre de las filas 
+descriptivas <- descriptivas %>% select(Estadisticas, everything()) # se ubica la columna creada en la primera posición 
+write_xlsx(descriptivas, "descriptivas.xlsx") # se exporta a excel tabla con las estadísticas descriptivas
 
-# estadísticas descriptivas por variable de interes
+# Tablas descriptivas
+tbl_summary(df) # generales
+tbl_summary(df, by= Pobre, statistic = list (all_continuous()~"{mean} ({sd})")) # por clasificación
 
-prop.table(table(df_hogares$Pobre))
+# Gráficos
+
+#no
+ggplot(data = df, mapping = aes(x = Ingtotob_hogar , y = Pobre)) +
+  geom_point(col = "red" , size = 0.5) # gráfico de dispersión entre la edad y el ingreso total
+
+ggplot(data = df , mapping = aes(x = Pobre , y = edad_promedio)) +
+  geom_point(col = "red" , size = 0.5) # gráfico de dispersión entre años de educación y e ingreso total
+
+ggplot(data = df , 
+       mapping = aes(x = edad_promedio , y = Pobre , group=as.factor(edu_promedio) , color=as.factor(edu_promedio))) +
+  geom_point() # trabajo formal (1) e informal (0)
+
+
+p <- ggplot(data=df) + 
+  geom_histogram(mapping = aes(x=Nro_hijos, group=(Pobre) , fill=(Pobre)))
+p + scale_fill_manual(values = c("Si"="green" , "No"="blue") , label = c("Si"="Pobre" , "No"="No Pobre") , name = "Clasificación") # histograma relación ingreso por género, distribución de los datos hacia la izquierda, es asimétrica, lo mejor que se puede hacer es transformar la seria a log y de esta forma normalizar los datos 
+
+#puede ser
+p <- ggplot(data=df) + 
+  geom_histogram(mapping = aes(x=Ingtotob_hogar, group=(Pobre) , fill=(Pobre)))
+p + scale_fill_manual(values = c("Si"="green" , "No"="blue") , label = c("Si"="Pobre" , "No"="No Pobre") , name = "Clasificación") # histograma relación ingreso por género, distribución de los datos hacia la izquierda, es asimétrica, lo mejor que se puede hacer es transformar la seria a log y de esta forma normalizar los datos 
+
+
+p <- ggplot(data=df) + 
+  geom_histogram(mapping = aes(x=Ingtotob_hogar, group=(Pobre) , fill=(Pobre)))
+p + scale_fill_manual(values = c("Si"="green" , "No"="blue") , label = c("Si"="Pobre" , "No"="No Pobre") , name = "Clasificación") # histograma relación ingreso por género, distribución de los datos hacia la izquierda, es asimétrica, lo mejor que se puede hacer es transformar la seria a log y de esta forma normalizar los datos 
+
+
+#se esta ejecutando #############3
+box_plot <- ggplot(data=df , mapping = aes(as.factor(Ingtotob_hogar) , edu_promedio)) + 
+  geom_boxplot()
+box_plot <- box_plot +
+  geom_point(aes(colour=as.factor(Pobre))) +
+  scale_color_manual(values = c("Si"="red" , "No"="blue") , label = c("Si"="Pobre" , "No"="No Pobre") , name = "Clasificación")+
+  labs(x = "Ingreso promedio por hogar", y = "No. años educación promedio")
+box_plot
+
+#hacer ####################
+box_plot2 <- ggplot(data=df , mapping = aes(as.factor(Nper) , Ingtotob_hogar)) + 
+  geom_boxplot()
+box_plot2 <- box_plot2 +
+  geom_point(aes(colour=as.factor(Pobre))) +
+  scale_color_manual(values = c("Si"="red" , "No"="blue") , label = c("Si"="Pobre" , "1"="No Pobre") , name = "Clasificación"), 
++  labs(x = "No. de personas por hogar", y = "Ingreso mensual promedio hogar")
+box_plot2  
 
 
 
-model <- as.formula("Pobre ~ tipo_vivienda + Dominio + Nro_personas_cuartos + cuota_amortizacion + arriendo + edad_promedio + jefe_hogar_mujer + Nro_hijos + edu_promedio + horas_trabajadas_promedio + porcentaje_mujeres + porcentaje_trabajo_formal + porcentaje_subsidio_familiar + segundo_trabajo + otros_ingresos + otros_ingresos_instituciones + tasa_ocupacion + tasa_desempleo + tasa_participacion")
-
-model2 <- as.formula("Pobre ~ tipo_vivienda + Dominio + Nro_personas_cuartos + cuota_amortizacion + arriendo + edad_promedio + edad_promedio:porcentaje_mujeres + jefe_hogar_mujer + Nro_hijos + Nro_hijos:porcentaje_mujeres + edu_promedio + edu_promedio:porcentaje_mujeres + edu_promedio:Dominio + edu_promedio:jefe_hogar_mujer + horas_trabajadas_promedio + horas_trabajadas_promedio:porcentaje_mujeres + horas_trabajadas_promedio:jefe_hogar_mujer + porcentaje_mujeres + porcentaje_trabajo_formal + porcentaje_subsidio_familiar + segundo_trabajo + otros_ingresos + otros_ingresos_instituciones + tasa_ocupacion + tasa_desempleo + tasa_participacion")
-
-fiveStats <- function(...) c(twoClassSummary(...), defaultSummary(...))
+df %>% select(c("Pobre", "Nper", "tipo_vivienda", "jefe_hogar_mujer", "Nro_hijos", "edu_promedio", "horas_trabajadas_promedio", "porcentaje_subsidio_familiar", "tasa_desempleo", "Ingtotob_hogar")) %>% chart.Correlation()
