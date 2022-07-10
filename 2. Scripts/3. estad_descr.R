@@ -32,6 +32,7 @@ prop.table(table(df_hogares$Pobre)) #20% pobres y 80% no pobre
 
 ## Se seleccionan variables de interes
 df <- df_hogares %>% select(c("Pobre", "Nper", "Nro_personas_trabajo_formal", "tipo_vivienda", "Dominio", "Nro_personas_cuartos", "cuota_amortizacion", "arriendo", "edad_promedio", "jefe_hogar_mujer", "Nro_hijos", "edu_promedio", "horas_trabajadas_promedio", "porcentaje_mujeres", "porcentaje_trabajo_formal", "porcentaje_subsidio_familiar", "segundo_trabajo", "otros_ingresos", "otros_ingresos_instituciones", "tasa_ocupacion", "tasa_desempleo", "tasa_participacion", "Ingtotob_hogar"))
+df2 <- df %>% mutate(loging = log(Ingtotob_hogar))
 
 ### 1. estadísticas descriptivas ###
 summary(df)
@@ -49,36 +50,41 @@ write_xlsx(descriptivas, "descriptivas.xlsx") # se exporta a excel tabla con las
 tbl_summary(df) # generales
 tbl_summary(df, by= Pobre, statistic = list (all_continuous()~"{mean} ({sd})")) # por clasificación
 
-# Gráficos
+## Gráficos
 
-#no
-ggplot(data = df, mapping = aes(x = Ingtotob_hogar , y = Pobre)) +
-  geom_point(col = "red" , size = 0.5) # gráfico de dispersión entre la edad y el ingreso total
+#Gráfico dispersión por ingreso
+ggplot(data = df2, mapping = aes(x = Pobre , y = log)) +
+  labs(x = "Pobre", y = "Ingreso promedio hogar") +
+    geom_point(col = "chocolate4" , size = 0.5) 
 
-ggplot(data = df , mapping = aes(x = Pobre , y = edad_promedio)) +
-  geom_point(col = "red" , size = 0.5) # gráfico de dispersión entre años de educación y e ingreso total
+ggplot(data = df , mapping = aes(x = Pobre , y = Nro_personas_cuartos)) +
+  geom_point(col = "red" , size = 0.5) 
+
+ggplot(data = df_hogares , mapping = aes(x = Pobre , y = Nro_personas_subsidio_familiar )) +
+  geom_point(col = "red" , size = 0.5)
 
 ggplot(data = df , 
        mapping = aes(x = edad_promedio , y = Pobre , group=as.factor(edu_promedio) , color=as.factor(edu_promedio))) +
-  geom_point() # trabajo formal (1) e informal (0)
+  geom_point() 
 
+p <- ggplot(data=df_hogares) + 
+  geom_histogram(mapping = aes(x=Nro_personas_subsidio_familiar, group=(Pobre) , fill=(Pobre)))
+p + scale_fill_manual(values = c("Si"="green" , "No"="blue") , label = c("Si"="Pobre" , "No"="No Pobre") , name = "Clasificación") # histograma relación ingreso por género, distribución de los datos hacia la izquierda, es asimétrica, lo mejor que se puede hacer es transformar la seria a log y de esta forma normalizar los datos 
 
 p <- ggplot(data=df) + 
   geom_histogram(mapping = aes(x=Nro_hijos, group=(Pobre) , fill=(Pobre)))
 p + scale_fill_manual(values = c("Si"="green" , "No"="blue") , label = c("Si"="Pobre" , "No"="No Pobre") , name = "Clasificación") # histograma relación ingreso por género, distribución de los datos hacia la izquierda, es asimétrica, lo mejor que se puede hacer es transformar la seria a log y de esta forma normalizar los datos 
 
-#puede ser
 p <- ggplot(data=df) + 
-  geom_histogram(mapping = aes(x=Ingtotob_hogar, group=(Pobre) , fill=(Pobre)))
+  geom_histogram(mapping = aes(x=porcentaje_mujeres, group=(Pobre) , fill=(Pobre)))
+p + scale_fill_manual(values = c("Si"="green" , "No"="blue") , label = c("Si"="Pobre" , "No"="No Pobre") , name = "Clasificación") # histograma relación ingreso por género, distribución de los datos hacia la izquierda, es asimétrica, lo mejor que se puede hacer es transformar la seria a log y de esta forma normalizar los datos 
+
+p <- ggplot(data=df2) + 
+  geom_histogram(mapping = aes(x=loging, group=(Pobre) , fill=(Pobre)))
 p + scale_fill_manual(values = c("Si"="green" , "No"="blue") , label = c("Si"="Pobre" , "No"="No Pobre") , name = "Clasificación") # histograma relación ingreso por género, distribución de los datos hacia la izquierda, es asimétrica, lo mejor que se puede hacer es transformar la seria a log y de esta forma normalizar los datos 
 
 
-p <- ggplot(data=df) + 
-  geom_histogram(mapping = aes(x=Ingtotob_hogar, group=(Pobre) , fill=(Pobre)))
-p + scale_fill_manual(values = c("Si"="green" , "No"="blue") , label = c("Si"="Pobre" , "No"="No Pobre") , name = "Clasificación") # histograma relación ingreso por género, distribución de los datos hacia la izquierda, es asimétrica, lo mejor que se puede hacer es transformar la seria a log y de esta forma normalizar los datos 
-
-
-#se esta ejecutando #############3
+# Relación entre años de educación e ingresos por hogar
 box_plot <- ggplot(data=df , mapping = aes(as.factor(edu_promedio) , Ingtotob_hogar)) + 
   geom_boxplot()
 box_plot <- box_plot +
@@ -91,20 +97,37 @@ box_plot
 box_plot2 <- ggplot(data=df , mapping = aes(as.factor(Nper) , Ingtotob_hogar)) + 
   geom_boxplot()
 box_plot2 <- box_plot2 +
-  labs(x = "No. de personas por hogar", y = "Ingreso mensual promedio hogar") +
+  labs(x = "No. de personas por hogar con trabajo formal", y = "Ingreso promedio por hogar") +
   geom_point(aes(colour=as.factor(Pobre))) + 
   scale_color_manual(values = c("Si"="red" , "No"="blue") , label = c("Si"="Pobre" , "1"="No Pobre") , name = "Clasificación")
 box_plot2  
 
-#correr
+# Relación número de personas con trabajo formal por hogar con ingreso total 
 box_plot3 <- ggplot(data=df , mapping = aes(as.factor(Nro_personas_trabajo_formal) , horas_trabajadas_promedio)) + 
   geom_boxplot()
-box_plot3 <- box_plot2 +
+box_plot3 <- box_plot3 +
   labs(x = "No. de personas por hogar con trabajo formal", y = "Horas promedio de trabajo semanal") +
   geom_point(aes(colour=as.factor(Pobre))) + 
   scale_color_manual(values = c("Si"="red" , "No"="blue") , label = c("Si"="Pobre" , "1"="No Pobre") , name = "Clasificación")
 box_plot3 
 
+# Relación tipo de vivienda e ingresos
+box_plot4 <- ggplot(data=df , mapping = aes(as.factor(tipo_vivienda) , Ingtotob_hogar)) + 
+  geom_boxplot()
+box_plot4 <- box_plot4 +
+  labs(x = "Tipo de vivienda", y = "Ingreso promedio por hogar") +
+  geom_point(aes(colour=as.factor(Pobre))) + 
+  scale_color_manual(values = c("Si"="red" , "No"="blue") , label = c("Si"="Pobre" , "1"="No Pobre") , name = "Clasificación")
+box_plot4 
 
+# Relación número de hijos con ingreso
+box_plot5 <- ggplot(data=df , mapping = aes(as.factor(Nro_hijos) , Ingtotob_hogar)) + 
+  geom_boxplot()
+box_plot5 <- box_plot5 +
+  labs(x = "No. hijos promedio hogar", y = "Ingreso promedio por hogar") +
+  geom_point(aes(colour=as.factor(Pobre))) + 
+  scale_color_manual(values = c("Si"="red" , "No"="blue") , label = c("Si"="Pobre" , "1"="No Pobre") , name = "Clasificación")
+box_plot5 
 
-df %>% select(c("Pobre", "Nper", "tipo_vivienda", "jefe_hogar_mujer", "Nro_hijos", "edu_promedio", "horas_trabajadas_promedio", "porcentaje_subsidio_familiar", "tasa_desempleo", "Ingtotob_hogar")) %>% chart.Correlation()
+# tabla de correlación entre las variables 
+df_hogares %>% select(c("Pobre", "jefe_hogar_mujer", "Nro_hijos", "edu_promedio", "horas_trabajadas_promedio", "porcentaje_subsidio_familiar", "tasa_desempleo", "Ingtotob_hogar")) %>% chart.Correlation()
