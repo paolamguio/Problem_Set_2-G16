@@ -33,7 +33,6 @@ prop.table(table(df_hogares$Pobre)) #20% pobres y 80% no pobre
 ## Se seleccionan variables de interes
 df <- df_hogares %>% select(c("Pobre", "Nper", "Nro_personas_trabajo_formal", "tipo_vivienda", "Dominio", "Nro_personas_cuartos", "cuota_amortizacion", "arriendo", "edad_promedio", "jefe_hogar_mujer", "Nro_hijos", "edu_promedio", "horas_trabajadas_promedio", "porcentaje_mujeres", "porcentaje_trabajo_formal", "porcentaje_subsidio_familiar", "segundo_trabajo", "otros_ingresos", "otros_ingresos_instituciones", "tasa_ocupacion", "tasa_desempleo", "tasa_participacion", "Ingtotob_hogar"))
 
-
 ### 1. estadísticas descriptivas ###
 summary(df)
 
@@ -80,22 +79,31 @@ p + scale_fill_manual(values = c("Si"="green" , "No"="blue") , label = c("Si"="P
 
 
 #se esta ejecutando #############3
-box_plot <- ggplot(data=df , mapping = aes(as.factor(Ingtotob_hogar) , edu_promedio)) + 
+box_plot <- ggplot(data=df , mapping = aes(as.factor(edu_promedio) , Ingtotob_hogar)) + 
   geom_boxplot()
 box_plot <- box_plot +
+  labs(x = "No. años educación promedio", y = "Ingreso promedio por hogar") +
   geom_point(aes(colour=as.factor(Pobre))) +
-  scale_color_manual(values = c("Si"="red" , "No"="blue") , label = c("Si"="Pobre" , "No"="No Pobre") , name = "Clasificación")+
-  labs(x = "Ingreso promedio por hogar", y = "No. años educación promedio")
+  scale_color_manual(values = c("Si"="red" , "No"="blue") , label = c("Si"="Pobre" , "No"="No Pobre") , name = "Clasificación")
 box_plot
 
-#hacer ####################
+# Relación número de personas por hogar con ingreso total 
 box_plot2 <- ggplot(data=df , mapping = aes(as.factor(Nper) , Ingtotob_hogar)) + 
   geom_boxplot()
 box_plot2 <- box_plot2 +
-  geom_point(aes(colour=as.factor(Pobre))) +
-  scale_color_manual(values = c("Si"="red" , "No"="blue") , label = c("Si"="Pobre" , "1"="No Pobre") , name = "Clasificación"), 
-+  labs(x = "No. de personas por hogar", y = "Ingreso mensual promedio hogar")
+  labs(x = "No. de personas por hogar", y = "Ingreso mensual promedio hogar") +
+  geom_point(aes(colour=as.factor(Pobre))) + 
+  scale_color_manual(values = c("Si"="red" , "No"="blue") , label = c("Si"="Pobre" , "1"="No Pobre") , name = "Clasificación")
 box_plot2  
+
+#correr
+box_plot3 <- ggplot(data=df , mapping = aes(as.factor(Nro_personas_trabajo_formal) , horas_trabajadas_promedio)) + 
+  geom_boxplot()
+box_plot3 <- box_plot2 +
+  labs(x = "No. de personas por hogar con trabajo formal", y = "Horas promedio de trabajo semanal") +
+  geom_point(aes(colour=as.factor(Pobre))) + 
+  scale_color_manual(values = c("Si"="red" , "No"="blue") , label = c("Si"="Pobre" , "1"="No Pobre") , name = "Clasificación")
+box_plot3 
 
 
 
