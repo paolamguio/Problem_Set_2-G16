@@ -364,3 +364,71 @@ evalResults <- data.frame(Pobre = evaluation$Pobre)
 evalResults$Roc_logit <- predict(logit,
                            newdata = evaluation,
                            type = "prob")[,1]
+
+evalResults$Roc_logit2 <- predict(logit2,
+                                 newdata = evaluation,
+                                 type = "prob")[,1]
+
+evalResults$Roc_logit_lasso <- predict(logit_lasso,
+                                 newdata = evaluation,
+                                 type = "prob")[,1]
+
+evalResults$Roc_logit_lasso2 <- predict(logit_lasso2,
+                                       newdata = evaluation,
+                                       type = "prob")[,1]
+
+evalResults$Roc_logit_ridge <- predict(logit_ridge,
+                                       newdata = evaluation,
+                                       type = "prob")[,1]
+
+evalResults$Roc_logit_ridge2 <- predict(logit_ridge2,
+                                       newdata = evaluation,
+                                       type = "prob")[,1]
+
+evalResults$Roc_logit_lasso_upsample <- predict(logit_lasso_upsample,
+                                       newdata = evaluation,
+                                       type = "prob")[,1]
+
+evalResults$Roc_logit_lasso_upsample2 <- predict(logit_lasso_upsample2,
+                                                newdata = evaluation,
+                                                type = "prob")[,1]
+
+evalResults$Roc_logit_ridge_upsample <- predict(logit_ridge_upsample,
+                                                newdata = evaluation,
+                                                type = "prob")[,1]
+
+evalResults$Roc_logit_ridge_upsample2 <- predict(logit_ridge_upsample2,
+                                                newdata = evaluation,
+                                                type = "prob")[,1]
+
+evalResults$Roc_logit_lasso_downsample <- predict(logit_lasso_downsample,
+                                                newdata = evaluation,
+                                                type = "prob")[,1]
+
+evalResults$Roc_logit_lasso_downsample2 <- predict(logit_lasso_downsample2,
+                                                  newdata = evaluation,
+                                                  type = "prob")[,1]
+
+evalResults$Roc_logit_ridge_downsample <- predict(logit_ridge_downsample,
+                                                  newdata = evaluation,
+                                                  type = "prob")[,1]
+
+evalResults$Roc_logit_ridge_downsample2 <- predict(logit_ridge_downsample2,
+                                                  newdata = evaluation,
+                                                  type = "prob")[,1]
+
+evalResults$Roc_logit_laso_smote <- predict(logit_lasso_smote,
+                                                  newdata = evaluation,
+                                                  type = "prob")[,1]
+
+evalResults$Roc_logit_laso_smote2 <- predict(logit_lasso_smote2,
+                                            newdata = evaluation,
+                                            type = "prob")[,1]
+
+evalResults$Roc_logit_ridge_smote <- predict(logit_ridge_smote,
+                                            newdata = evaluation,
+                                            type = "prob")[,1]
+
+evalResults$Roc_logit_ridge_smote2 <- predict(logit_ridge_smote2,
+                                             newdata = evaluation,
+                                             type = "prob")[,1]
