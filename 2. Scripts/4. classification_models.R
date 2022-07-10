@@ -358,3 +358,9 @@ logit_ridge_smote2 <- train(
 logit_ridge_smote2
 
 ### 5. Evaluación de resultados ###
+
+evalResults <- data.frame(Pobre = evaluation$Pobre)
+
+evalResults$Roc_logit <- predict(logit,
+                           newdata = evaluation,
+                           type = "prob")[,1]
