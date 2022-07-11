@@ -113,7 +113,7 @@ logit2
 
 ## 4.2. Modelo lasso - datos de entrenamiento ###
 
-lambda_grid <- 10^seq(-4, 0.01, length = 300)
+lambda_grid <- 10^seq(-4, 0.01, length = 100)
 
 set.seed(1410)
 
@@ -171,6 +171,8 @@ logit_ridge2 <- train(
 
 logit_ridge2
 
+## 4.4. Modelo logit EN - datos de entrenamiento ###
+
 logit_elasticnet <- train(
   model,
   data = training,
@@ -195,15 +197,15 @@ logit_elasticnet2 <- train(
 
 logit_elasticnet2
 
-## 4.4. Modelo logit lasso up sample - datos de entrenamiento ###
+## 4.5. Modelo logit lasso up sample - datos de entrenamiento ###
 
-set.seed(1103)
+set.seed(1410)
 
 upSampledTrain <- upSample(x = training,
                            y = training$Pobre,
                            yname = "Pobre")
 
-table(upSampledTrain$Pobre)
+table(upSampledTrain$Pobre) # se balancean hacia arriba
 
 set.seed(1410)
 
@@ -233,6 +235,8 @@ logit_lasso_upsample2 <- train(
 
 logit_lasso_upsample2
 
+## 4.6. Modelo logit ridge up sample - datos de entrenamiento ###
+
 logit_ridge_upsample <- train(
   model,
   data = upSampledTrain,
@@ -259,6 +263,8 @@ logit_ridge_upsample2 <- train(
 
 logit_ridge_upsample2
 
+## 4.7. Modelo logit EN up sample - datos de entrenamiento ###
+
 logit_elasticnet_upsample <- train(
   model,
   data = upSampledTrain,
@@ -283,7 +289,9 @@ logit_elasticnet_upsample2 <- train(
 
 logit_elasticnet_upsample2
 
-set.seed(1103)
+## 4.8. Modelo logit lasso down sample - datos de entrenamiento ###
+
+set.seed(1410)
 
 downSampledTrain <- downSample(x = training,
                                y = training$Pobre,
@@ -319,6 +327,8 @@ logit_lasso_downsample2 <- train(
 
 logit_lasso_downsample2
 
+## 4.9. Modelo logit ridge down sample - datos de entrenamiento ###
+
 logit_ridge_downsample <- train(
   model,
   data = downSampledTrain,
@@ -344,6 +354,8 @@ logit_ridge_downsample2 <- train(
 )
 
 logit_ridge_downsample2
+
+## 4.10. Modelo logit EN down sample - datos de entrenamiento ###
 
 logit_elasticnet_downsample <- train(
   model,
