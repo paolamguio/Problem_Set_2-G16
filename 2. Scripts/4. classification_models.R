@@ -125,7 +125,7 @@ logit_lasso <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -138,7 +138,7 @@ logit_lasso2 <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -153,7 +153,7 @@ logit_ridge <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -166,7 +166,7 @@ logit_ridge2 <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -181,7 +181,7 @@ logit_elasticnet <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   preProcess = c("center", "scale")
 )
 
@@ -193,7 +193,7 @@ logit_elasticnet2 <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   preProcess = c("center", "scale")
 )
 
@@ -217,7 +217,7 @@ logit_lasso_upsample <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -230,7 +230,7 @@ logit_lasso_upsample2 <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -245,7 +245,7 @@ logit_ridge_upsample <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -258,7 +258,7 @@ logit_ridge_upsample2 <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -273,7 +273,7 @@ logit_elasticnet_upsample <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   preProcess = c("center", "scale")
 )
 
@@ -285,7 +285,7 @@ logit_elasticnet_upsample2 <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   preProcess = c("center", "scale")
 )
 
@@ -309,7 +309,7 @@ logit_lasso_downsample <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -322,7 +322,7 @@ logit_lasso_downsample2 <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -337,7 +337,7 @@ logit_ridge_downsample <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -350,7 +350,7 @@ logit_ridge_downsample2 <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -365,7 +365,7 @@ logit_elasticnet_downsample <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   preProcess = c("center", "scale")
 )
 
@@ -377,7 +377,7 @@ logit_elasticnet_downsample2 <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   preProcess = c("center", "scale")
 )
 
@@ -407,7 +407,7 @@ logit_lasso_smote <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -420,7 +420,7 @@ logit_lasso_smote2 <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -433,7 +433,7 @@ logit_ridge_smote <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -446,7 +446,7 @@ logit_ridge_smote2 <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   tuneGrid = expand.grid(alpha = 1,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
@@ -459,7 +459,7 @@ logit_elasticnet_smote <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   preProcess = c("center", "scale")
 )
 
@@ -471,7 +471,7 @@ logit_elasticnet_smote2 <- train(
   method = "glmnet",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec",
+  metric = "Sens",
   preProcess = c("center", "scale")
 )
 
@@ -945,7 +945,7 @@ forest <- train(
   method = "rf",
   trControl = ctrl,
   family = "binomial",
-  metric="Spec"
+  metric="Sens"
 )
 
 forest
@@ -956,7 +956,7 @@ forest2 <- train(
   method = "rf",
   trControl = ctrl,
   family = "binomial",
-  metric="Spec"
+  metric="Sens"
 )
 
 forest2
@@ -973,7 +973,7 @@ adaboost <- train(
   method = "adaboost",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec"
+  metric = "Sens"
 )
 
 adaboost
@@ -984,7 +984,7 @@ adaboost2 <- train(
   method = "adaboost",
   trControl = ctrl,
   family = "binomial",
-  metric = "Spec"
+  metric = "Sens"
 )
 
 adaboost2
