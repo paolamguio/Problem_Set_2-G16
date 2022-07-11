@@ -76,6 +76,15 @@ colnames(training)
 model <- as.formula("Pobre ~ tipo_vivienda + Dominio + Nro_personas_cuartos + cuota_amortizacion + arriendo + edad_promedio + jefe_hogar_mujer + Nro_hijos + edu_promedio + horas_trabajadas_promedio + porcentaje_mujeres + porcentaje_trabajo_formal + porcentaje_subsidio_familiar + segundo_trabajo + otros_ingresos + otros_ingresos_instituciones + tasa_ocupacion + tasa_desempleo + tasa_participacion")
 model2 <- as.formula("Pobre ~ tipo_vivienda + Dominio + Nro_personas_cuartos + cuota_amortizacion + arriendo + edad_promedio + edad_promedio:porcentaje_mujeres + jefe_hogar_mujer + Nro_hijos + Nro_hijos:porcentaje_mujeres + edu_promedio + edu_promedio:porcentaje_mujeres + edu_promedio:Dominio + edu_promedio:jefe_hogar_mujer + horas_trabajadas_promedio + horas_trabajadas_promedio:porcentaje_mujeres + horas_trabajadas_promedio:jefe_hogar_mujer + porcentaje_mujeres + porcentaje_trabajo_formal + porcentaje_subsidio_familiar + segundo_trabajo + otros_ingresos + otros_ingresos_instituciones + tasa_ocupacion + tasa_desempleo + tasa_participacion")
 
+trainX<-data.frame(model.matrix(model,data=training), Pobre = training$Pobre)[-1]
+trainX2<-data.frame(model.matrix(model2,data=training), Pobre = training$Pobre)[-1]
+
+evalX<-data.frame(model.matrix(model,data=evaluation), Pobre = evaluation$Pobre)[-1]
+evalX2<-data.frame(model.matrix(model2,data=evaluation), Pobre = evaluation$Pobre)[-1]
+
+testX<-data.frame(model.matrix(model,data=testing), Pobre = testing$Pobre)[-1]
+testX2<-data.frame(model.matrix(model2,data=testing), Pobre = testing$Pobre)[-1]
+
 fiveStats <- function(...) c(twoClassSummary(...), defaultSummary(...))
 
 ### 4. Modelos de predicción ###
@@ -562,27 +571,27 @@ evalResults$Roc_logit_elasticnet_downsample2 <- predict(logit_elasticnet_downsam
                                                        type = "prob")[,1]
 
 evalResults$Roc_logit_laso_smote <- predict(logit_lasso_smote,
-                                                  newdata = evaluation,
+                                                  newdata = evalX,
                                                   type = "prob")[,1]
 
 evalResults$Roc_logit_laso_smote2 <- predict(logit_lasso_smote2,
-                                            newdata = evaluation,
+                                            newdata = evalX2,
                                             type = "prob")[,1]
 
 evalResults$Roc_logit_ridge_smote <- predict(logit_ridge_smote,
-                                            newdata = evaluation,
+                                            newdata = evalX,
                                             type = "prob")[,1]
 
 evalResults$Roc_logit_ridge_smote2 <- predict(logit_ridge_smote2,
-                                             newdata = evaluation,
+                                             newdata = evalX2,
                                              type = "prob")[,1]
 
 evalResults$Roc_logit_elasticnet_smote <- predict(logit_elasticnet_smote,
-                                             newdata = evaluation,
+                                             newdata = evalX,
                                              type = "prob")[,1]
 
 evalResults$Roc_logit_elasticnet_smote2 <- predict(logit_elasticnet_smote2,
-                                                  newdata = evaluation,
+                                                  newdata = evalX2,
                                                   type = "prob")[,1]
 
 # Cálculo de c
@@ -1072,27 +1081,27 @@ testResults$logit_elasticnet_downsample2<- predict(logit_elasticnet_downsample2,
                                                   type = "prob")[,1]
 
 testResults$logit_lasso_smote<- predict(logit_lasso_smote,
-                                                  newdata = testing,
+                                                  newdata = testX,
                                                   type = "prob")[,1]
 
 testResults$logit_lasso_smote2<- predict(logit_lasso_smote2,
-                                        newdata = testing,
+                                        newdata = testX2,
                                         type = "prob")[,1]
 
 testResults$logit_ridge_smote<- predict(logit_ridge_smote,
-                                        newdata = testing,
+                                        newdata = testX,
                                         type = "prob")[,1]
 
 testResults$logit_ridge_smote2<- predict(logit_ridge_smote2,
-                                        newdata = testing,
+                                        newdata = testX2,
                                         type = "prob")[,1]
 
 testResults$logit_elasticnet_smote<- predict(logit_elasticnet_smote,
-                                        newdata = testing,
+                                        newdata = testX,
                                         type = "prob")[,1]
 
 testResults$logit_elasticnet_smote2<- predict(logit_elasticnet_smote2,
-                                             newdata = testing,
+                                             newdata = testX2,
                                              type = "prob")[,1]
 
 testResults <- testResults %>% mutate(logit_thresh = logit,
@@ -1177,9 +1186,9 @@ testResults<-testResults %>%
          logit_elasticnet_smote_thresh2=ifelse(logit_elasticnet_smote_thresh2>rfThresh_logit_elasticnet_smote2$threshold,"Si","No"),
   )
 
-pred_tree<-predict(tree,testing)
+pred_tree<-predict(tree,testX)
 
-pred_tree2<-predict(tree2,testing)
+pred_tree2<-predict(tree2,testX2)
 
 pred_rf<-predict(forest,testing)
 
