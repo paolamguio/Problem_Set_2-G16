@@ -381,22 +381,22 @@ logit_elasticnet_downsample2 <- train(
 
 logit_elasticnet_downsample2
 
-trainX<-data.frame(model.matrix(model,data=training))[-1]
+## 4.11. Modelo SMOTE ###
 
+require("smotefa")
+
+trainX<-data.frame(model.matrix(model,data=training))[-1]
 trainX2<-data.frame(model.matrix(model2,data=training))[-1]
 
 smote_output = SMOTE(X = trainX,
                      target = training$Pobre)
-
 smote_output2 = SMOTE(X = trainX2,
                      target = training$Pobre)
 
 oversampled_data <- smote_output$data
-
 oversampled_data2 <- smote_output$data2
 
 table(oversampled_data$Pobre)
-
 table(oversampled_data2$Pobre)
 
 set.seed(1410)
@@ -585,7 +585,10 @@ evalResults$Roc_logit_elasticnet_smote2 <- predict(logit_elasticnet_smote2,
                                                   newdata = evaluation,
                                                   type = "prob")[,1]
 
+# Cálculo de c
+
 rfROC_logit <- roc(evalResults$Pobre, evalResults$Roc_logit, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit
 
 rfROC_logit2 <- roc(evalResults$Pobre, evalResults$Roc_logit2, levels = rev(levels(evalResults$Pobre)))
 
@@ -637,108 +640,84 @@ rfROC_logit_elasticnet_smote <- roc(evalResults$Pobre, evalResults$Roc_logit_ela
 
 rfROC_logit_elasticnet_smote2 <- roc(evalResults$Pobre, evalResults$Roc_logit_elasticnet_smote2, levels = rev(levels(evalResults$Pobre)))
 
-rfThresh_logit <- coords(rfROC_logit, x = "best", best.method = "closest.topleft")
+# cálculo de c más cercano (threshold)
 
+rfThresh_logit <- coords(rfROC_logit, x = "best", best.method = "closest.topleft")
 rfThresh_logit
 
 rfThresh_logit2 <- coords(rfROC_logit2, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit2
 
 rfThresh_logit_lasso <- coords(rfROC_logit_lasso, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_lasso
 
 rfThresh_logit_lasso2 <- coords(rfROC_logit_lasso2, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_lasso2
 
 rfThresh_logit_ridge <- coords(rfROC_logit_ridge, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_ridge
 
 rfThresh_logit_ridge2 <- coords(rfROC_logit_ridge2, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_ridge2
 
 rfThresh_logit_elasticnet <- coords(rfROC_logit_elasticnet, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_elasticnet
 
 rfThresh_logit_elasticnet2 <- coords(rfROC_logit_elasticnet2, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_elasticnet2
 
 rfThresh_logit_lasso_upsample <- coords(rfROC_logit_lasso_upsample, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_lasso_upsample
 
 rfThresh_logit_lasso_upsample2 <- coords(rfROC_logit_lasso_upsample2, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_lasso_upsample2
 
 rfThresh_logit_ridge_upsample <- coords(rfROC_logit_ridge_upsample, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_ridge_upsample
 
 rfThresh_logit_ridge_upsample2 <- coords(rfROC_logit_ridge_upsample2, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_ridge_upsample2
 
 rfThresh_logit_elasticnet_upsample <- coords(rfROC_logit_elasticnet_upsample, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_elasticnet_upsample
 
 rfThresh_logit_elasticnet_upsample2 <- coords(rfROC_logit_elasticnet_upsample2, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_elasticnet_upsample2
 
 rfThresh_logit_lasso_downsample <- coords(rfROC_logit_lasso_downsample, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_lasso_downsample
 
 rfThresh_logit_lasso_downsample2 <- coords(rfROC_logit_lasso_downsample2, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_lasso_downsample2
 
 rfThresh_logit_ridge_downsample <- coords(rfROC_logit_ridge_downsample, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_ridge_downsample
 
 rfThresh_logit_ridge_downsample2 <- coords(rfROC_logit_ridge_downsample2, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_ridge_downsample2
 
 rfThresh_logit_elasticnet_downsample <- coords(rfROC_logit_elasticnet_downsample, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_elasticnet_downsample
 
 rfThresh_logit_elasticnet_downsample2 <- coords(rfROC_logit_elasticnet_downsample2, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_elasticnet_downsample2
 
 rfThresh_logit_lasso_smote <- coords(rfROC_logit_lasso_smote, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_lasso_smote
 
 rfThresh_logit_lasso_smote2 <- coords(rfROC_logit_lasso_smote2, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_lasso_smote2
 
 rfThresh_logit_ridge_smote <- coords(rfROC_logit_ridge_smote, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_ridge_smote
 
 rfThresh_logit_ridge_smote2 <- coords(rfROC_logit_ridge_smote2, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_ridge_smote2
 
 rfThresh_logit_elasticnet_smote <- coords(rfROC_logit_elasticnet_smote, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_elasticnet_smote
 
 rfThresh_logit_elasticnet_smote2 <- coords(rfROC_logit_elasticnet_smote2, x = "best", best.method = "closest.topleft")
-
 rfThresh_logit_elasticnet_smote2
 
 evalResults<-evalResults %>% mutate(hat_pobre_05_logit=ifelse(evalResults$Roc_logit>0.5,"Si","No"),
@@ -794,7 +773,38 @@ evalResults<-evalResults %>% mutate(hat_pobre_05_logit=ifelse(evalResults$Roc_lo
                                     hat_pobre_05_logit_elasticnet_smote2=ifelse(evalResults$Roc_logit_elasticnet_smote2>0.5,"Si","No"),
                                     hat_pobre_rfThresh_logit_elasticnet_smote2=ifelse(evalResults$Roc_logit_elasticnet_smote2>rfThresh_logit_elasticnet_smote2$threshold,"Si","No"))
 
-with(evalResults,table(Pobre,hat_pobre_05_logit))
+
+# Paola, si corre pero lo que sigue no 
+evalResults<-evalResults %>% mutate(hat_pobre_05_logit=ifelse(evalResults$Roc_logit>0.5,"Si","No"),
+                                    hat_pobre_rfThresh_logit=ifelse(evalResults$Roc_logit>rfThresh_logit$threshold,"Si","No"),
+                                    hat_pobre_05_logit2=ifelse(evalResults$Roc_logit2>0.5,"Si","No"),
+                                    hat_pobre_rfThresh_logit2=ifelse(evalResults$Roc_logit2>rfThresh_logit2$threshold,"Si","No"),
+                                    hat_pobre_05_logit_lasso=ifelse(evalResults$Roc_logit_lasso>0.5,"Si","No"),
+                                    hat_pobre_rfThresh_logit_lasso=ifelse(evalResults$Roc_logit_lasso>rfThresh_logit_lasso$threshold,"Si","No"),
+                                    hat_pobre_05_logit_lasso2=ifelse(evalResults$Roc_logit_lasso2>0.5,"Si","No"),
+                                    hat_pobre_rfThresh_logit_lasso2=ifelse(evalResults$Roc_logit_lasso2>rfThresh_logit_lasso2$threshold,"Si","No"),
+                                    hat_pobre_05_logit_elasticnet=ifelse(evalResults$Roc_logit_elasticnet>0.5,"Si","No"),
+                                    hat_pobre_rfThresh_logit_elasticnet=ifelse(evalResults$Roc_logit_elasticnet>rfThresh_logit_elasticnet$threshold,"Si","No"),
+                                    hat_pobre_05_logit_elasticnet2=ifelse(evalResults$Roc_logit_elasticnet2>0.5,"Si","No"),
+                                    hat_pobre_rfThresh_logit_elasticnet2=ifelse(evalResults$Roc_logit_elasticnet2>rfThresh_logit_elasticnet2$threshold,"Si","No"),
+                                    hat_pobre_05_logit_lasso_upsample=ifelse(evalResults$Roc_logit_lasso_upsample>0.5,"Si","No"),
+                                    hat_pobre_rfThresh_logit_lasso_upsample=ifelse(evalResults$Roc_logit_lasso_upsample>rfThresh_logit_lasso_upsample$threshold,"Si","No"),
+                                    hat_pobre_05_logit_lasso_upsample2=ifelse(evalResults$Roc_logit_lasso_upsample2>0.5,"Si","No"),
+                                    hat_pobre_rfThresh_logit_lasso_upsample2=ifelse(evalResults$Roc_logit_lasso_upsample2>rfThresh_logit_lasso_upsample2$threshold,"Si","No"),
+                                    hat_pobre_05_logit_elasticnet_upsample=ifelse(evalResults$Roc_logit_elasticnet_upsample>0.5,"Si","No"),
+                                    hat_pobre_rfThresh_logit_elasticnet_upsample=ifelse(evalResults$Roc_logit_elasticnet_upsample>rfThresh_logit_elasticnet_upsample$threshold,"Si","No"),
+                                    hat_pobre_05_logit_elasticnet_upsample2=ifelse(evalResults$Roc_logit_elasticnet_upsample2>0.5,"Si","No"),
+                                    hat_pobre_rfThresh_logit_elasticnet_upsample2=ifelse(evalResults$Roc_logit_elasticnet_upsample2>rfThresh_logit_elasticnet_upsample2$threshold,"Si","No"),
+                                    hat_pobre_05_logit_lasso_downsample=ifelse(evalResults$Roc_logit_lasso_downsample>0.5,"Si","No"),
+                                    hat_pobre_rfThresh_logit_lasso_downsample=ifelse(evalResults$Roc_logit_lasso_downsample>rfThresh_logit_lasso_downsample$threshold,"Si","No"),
+                                    hat_pobre_05_logit_lasso_downsample2=ifelse(evalResults$Roc_logit_lasso_downsample2>0.5,"Si","No"),
+                                    hat_pobre_rfThresh_logit_lasso_downsample2=ifelse(evalResults$Roc_logit_lasso_downsample2>rfThresh_logit_lasso_downsample2$threshold,"Si","No"),
+                                    hat_pobre_05_logit_ridge_downsample=ifelse(evalResults$Roc_logit_ridge_downsample>0.5,"Si","No"),
+                                    hat_pobre_rfThresh_logit_ridge_downsample=ifelse(evalResults$Roc_logit_ridge_downsample>rfThresh_logit_ridge_downsample$threshold,"Si","No"),
+                                    hat_pobre_05_logit_ridge_downsample2=ifelse(evalResults$Roc_logit_ridge_downsample2>0.5,"Si","No"),
+                                    hat_pobre_rfThresh_logit_ridge_downsample2=ifelse(evalResults$Roc_logit_ridge_downsample2>rfThresh_logit_ridge_downsample2$threshold,"Si","No"))
+
+with(evalResults, table(Pobre, hat_pobre_05_logit))
 
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit))
 
@@ -898,6 +908,7 @@ with(evalResults,table(Pobre,hat_pobre_05_logit_elasticnet_smote2))
 
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_elasticnet_smote2))
 
+### Modelo de árbol para clasificación ###
 set.seed(1410)
 
 tree <- train(
