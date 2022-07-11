@@ -29,7 +29,9 @@ p_load(
   smotefamily,
   rpart,
   randomForest,
-  fastAdaboost
+  fastAdaboost,
+  glmnet,
+  rpart.plot
 )
 
 ### 1. llamado base de datos creada en 2.data_cleaning2.R ###
@@ -383,8 +385,6 @@ logit_elasticnet_downsample2
 
 ## 4.11. Modelo SMOTE ###
 
-require("smotefa")
-
 trainX<-data.frame(model.matrix(model,data=training))[-1]
 trainX2<-data.frame(model.matrix(model2,data=training))[-1]
 
@@ -394,15 +394,15 @@ smote_output2 = SMOTE(X = trainX2,
                      target = training$Pobre)
 
 oversampled_data <- smote_output$data
-oversampled_data2 <- smote_output$data2
+oversampled_data2 <- smote_output2$data
 
-table(oversampled_data$Pobre)
-table(oversampled_data2$Pobre)
+table(oversampled_data$class)
+table(oversampled_data2$class)
 
 set.seed(1410)
 
 logit_lasso_smote <- train(
-  model,
+  class~.,
   data = oversampled_data,
   method = "glmnet",
   trControl = ctrl,
@@ -415,7 +415,7 @@ logit_lasso_smote <- train(
 logit_lasso_smote
 
 logit_lasso_smote2 <- train(
-  model2,
+  class~.,
   data = oversampled_data2,
   method = "glmnet",
   trControl = ctrl,
@@ -428,7 +428,7 @@ logit_lasso_smote2 <- train(
 logit_lasso_smote2
 
 logit_ridge_smote <- train(
-  model,
+  class~.,
   data = oversampled_data,
   method = "glmnet",
   trControl = ctrl,
@@ -441,7 +441,7 @@ logit_ridge_smote <- train(
 logit_ridge_smote
 
 logit_ridge_smote2 <- train(
-  model2,
+  class~.,
   data = oversampled_data2,
   method = "glmnet",
   trControl = ctrl,
@@ -454,7 +454,7 @@ logit_ridge_smote2 <- train(
 logit_ridge_smote2
 
 logit_elasticnet_smote <- train(
-  model,
+  class~.,
   data = oversampled_data,
   method = "glmnet",
   trControl = ctrl,
@@ -466,7 +466,7 @@ logit_elasticnet_smote <- train(
 logit_elasticnet_smote
 
 logit_elasticnet_smote2 <- train(
-  model2,
+  class~.,
   data = oversampled_data2,
   method = "glmnet",
   trControl = ctrl,
