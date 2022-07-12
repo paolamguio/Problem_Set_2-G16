@@ -124,7 +124,7 @@ logit2
 
 ## 4.2. Modelo lasso - datos de entrenamiento ###
 
-lambda_grid <- 10^seq(-4, 0.01, length = 100)
+lambda_grid <- 10^seq(-4, 0.01, length = 300)
 
 set.seed(1410)
 
@@ -211,6 +211,8 @@ logit_elasticnet2
 ## 4.5. Modelo logit lasso up sample - datos de entrenamiento ###
 
 set.seed(1410)
+
+lambda_grid <- 10^seq(-4, 0.01, length = 100)
 
 upSampledTrain <- upSample(x = training,
                            y = training$Pobre,
@@ -410,6 +412,8 @@ table(oversampled_data2$class)
 
 set.seed(1410)
 
+## 4.11.1. Logit lasso SMOTE ###
+
 logit_lasso_smote <- train(
   class~.,
   data = oversampled_data,
@@ -436,6 +440,8 @@ logit_lasso_smote2 <- train(
 
 logit_lasso_smote2
 
+## 4.11.2. Logit ridge SMOTE ### 
+
 logit_ridge_smote <- train(
   class~.,
   data = oversampled_data,
@@ -461,6 +467,8 @@ logit_ridge_smote2 <- train(
 )
 
 logit_ridge_smote2
+
+## 4.11.3. Logit EN SMOTE ### 
 
 logit_elasticnet_smote <- train(
   class~.,
@@ -570,11 +578,11 @@ evalResults$Roc_logit_elasticnet_downsample2 <- predict(logit_elasticnet_downsam
                                                        newdata = evaluation,
                                                        type = "prob")[,1]
 
-evalResults$Roc_logit_laso_smote <- predict(logit_lasso_smote,
+evalResults$Roc_logit_lasso_smote <- predict(logit_lasso_smote,
                                                   newdata = evalX,
                                                   type = "prob")[,1]
 
-evalResults$Roc_logit_laso_smote2 <- predict(logit_lasso_smote2,
+evalResults$Roc_logit_lasso_smote2 <- predict(logit_lasso_smote2,
                                             newdata = evalX2,
                                             type = "prob")[,1]
 
@@ -600,54 +608,79 @@ rfROC_logit <- roc(evalResults$Pobre, evalResults$Roc_logit, levels = rev(levels
 rfROC_logit
 
 rfROC_logit2 <- roc(evalResults$Pobre, evalResults$Roc_logit2, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit2
 
 rfROC_logit_lasso <- roc(evalResults$Pobre, evalResults$Roc_logit_lasso, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_lasso
 
 rfROC_logit_lasso2 <- roc(evalResults$Pobre, evalResults$Roc_logit_lasso2, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_lasso2
 
 rfROC_logit_ridge <- roc(evalResults$Pobre, evalResults$Roc_logit_ridge, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_ridge
 
 rfROC_logit_ridge2 <- roc(evalResults$Pobre, evalResults$Roc_logit_ridge2, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_ridge2
 
 rfROC_logit_elasticnet <- roc(evalResults$Pobre, evalResults$Roc_logit_elasticnet, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_elasticnet
 
 rfROC_logit_elasticnet2 <- roc(evalResults$Pobre, evalResults$Roc_logit_elasticnet2, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_elasticnet2
 
 rfROC_logit_lasso_upsample <- roc(evalResults$Pobre, evalResults$Roc_logit_lasso_upsample, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_lasso_upsample 
 
 rfROC_logit_lasso_upsample2 <- roc(evalResults$Pobre, evalResults$Roc_logit_lasso_upsample2, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_lasso_upsample2
 
 rfROC_logit_ridge_upsample <- roc(evalResults$Pobre, evalResults$Roc_logit_ridge_upsample, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_ridge_upsample
 
 rfROC_logit_ridge_upsample2 <- roc(evalResults$Pobre, evalResults$Roc_logit_ridge_upsample2, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_ridge_upsample2
 
 rfROC_logit_elasticnet_upsample <- roc(evalResults$Pobre, evalResults$Roc_logit_elasticnet_upsample, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_elasticnet_upsample
 
 rfROC_logit_elasticnet_upsample2 <- roc(evalResults$Pobre, evalResults$Roc_logit_elasticnet_upsample2, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_elasticnet_upsample2
 
 rfROC_logit_lasso_downsample <- roc(evalResults$Pobre, evalResults$Roc_logit_lasso_downsample, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_lasso_downsample
 
 rfROC_logit_lasso_downsample2 <- roc(evalResults$Pobre, evalResults$Roc_logit_lasso_downsample2, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_lasso_downsample2
 
 rfROC_logit_ridge_downsample <- roc(evalResults$Pobre, evalResults$Roc_logit_ridge_downsample, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_ridge_downsample
 
 rfROC_logit_ridge_downsample2 <- roc(evalResults$Pobre, evalResults$Roc_logit_ridge_downsample2, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_ridge_downsample2
 
-rfROC_logit_elasticnet_downsample <- roc(evalResults$Pobre, evalResults_Roc_logit_elasticnet_downsample, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_elasticnet_downsample <- roc(evalResults$Pobre, evalResults$Roc_logit_elasticnet_downsample, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_elasticnet_downsample
 
-rfROC_logit_elasticnet_downsample2 <- roc(evalResults$Pobre, evalResults_Roc_logit_elasticnet_downsample2, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_elasticnet_downsample2 <- roc(evalResults$Pobre, evalResults$Roc_logit_elasticnet_downsample2, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_elasticnet_downsample2
 
 rfROC_logit_lasso_smote <- roc(evalResults$Pobre, evalResults$Roc_logit_lasso_smote, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_lasso_smote
 
 rfROC_logit_lasso_smote2 <- roc(evalResults$Pobre, evalResults$Roc_logit_lasso_smote2, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_lasso_smote2
 
 rfROC_logit_ridge_smote <- roc(evalResults$Pobre, evalResults$Roc_logit_ridge_smote, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_ridge_smote
 
 rfROC_logit_ridge_smote2 <- roc(evalResults$Pobre, evalResults$Roc_logit_ridge_smote2, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_ridge_smote2
 
 rfROC_logit_elasticnet_smote <- roc(evalResults$Pobre, evalResults$Roc_logit_elasticnet_smote, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_elasticnet_smote
 
 rfROC_logit_elasticnet_smote2 <- roc(evalResults$Pobre, evalResults$Roc_logit_elasticnet_smote2, levels = rev(levels(evalResults$Pobre)))
+rfROC_logit_elasticnet_smote2
 
 # cálculo de c más cercano (threshold)
 
@@ -782,139 +815,84 @@ evalResults<-evalResults %>% mutate(hat_pobre_05_logit=ifelse(evalResults$Roc_lo
                                     hat_pobre_05_logit_elasticnet_smote2=ifelse(evalResults$Roc_logit_elasticnet_smote2>0.5,"Si","No"),
                                     hat_pobre_rfThresh_logit_elasticnet_smote2=ifelse(evalResults$Roc_logit_elasticnet_smote2>rfThresh_logit_elasticnet_smote2$threshold,"Si","No"))
 
-
-# Paola, si corre pero lo que sigue no 
-evalResults<-evalResults %>% mutate(hat_pobre_05_logit=ifelse(evalResults$Roc_logit>0.5,"Si","No"),
-                                    hat_pobre_rfThresh_logit=ifelse(evalResults$Roc_logit>rfThresh_logit$threshold,"Si","No"),
-                                    hat_pobre_05_logit2=ifelse(evalResults$Roc_logit2>0.5,"Si","No"),
-                                    hat_pobre_rfThresh_logit2=ifelse(evalResults$Roc_logit2>rfThresh_logit2$threshold,"Si","No"),
-                                    hat_pobre_05_logit_lasso=ifelse(evalResults$Roc_logit_lasso>0.5,"Si","No"),
-                                    hat_pobre_rfThresh_logit_lasso=ifelse(evalResults$Roc_logit_lasso>rfThresh_logit_lasso$threshold,"Si","No"),
-                                    hat_pobre_05_logit_lasso2=ifelse(evalResults$Roc_logit_lasso2>0.5,"Si","No"),
-                                    hat_pobre_rfThresh_logit_lasso2=ifelse(evalResults$Roc_logit_lasso2>rfThresh_logit_lasso2$threshold,"Si","No"),
-                                    hat_pobre_05_logit_elasticnet=ifelse(evalResults$Roc_logit_elasticnet>0.5,"Si","No"),
-                                    hat_pobre_rfThresh_logit_elasticnet=ifelse(evalResults$Roc_logit_elasticnet>rfThresh_logit_elasticnet$threshold,"Si","No"),
-                                    hat_pobre_05_logit_elasticnet2=ifelse(evalResults$Roc_logit_elasticnet2>0.5,"Si","No"),
-                                    hat_pobre_rfThresh_logit_elasticnet2=ifelse(evalResults$Roc_logit_elasticnet2>rfThresh_logit_elasticnet2$threshold,"Si","No"),
-                                    hat_pobre_05_logit_lasso_upsample=ifelse(evalResults$Roc_logit_lasso_upsample>0.5,"Si","No"),
-                                    hat_pobre_rfThresh_logit_lasso_upsample=ifelse(evalResults$Roc_logit_lasso_upsample>rfThresh_logit_lasso_upsample$threshold,"Si","No"),
-                                    hat_pobre_05_logit_lasso_upsample2=ifelse(evalResults$Roc_logit_lasso_upsample2>0.5,"Si","No"),
-                                    hat_pobre_rfThresh_logit_lasso_upsample2=ifelse(evalResults$Roc_logit_lasso_upsample2>rfThresh_logit_lasso_upsample2$threshold,"Si","No"),
-                                    hat_pobre_05_logit_elasticnet_upsample=ifelse(evalResults$Roc_logit_elasticnet_upsample>0.5,"Si","No"),
-                                    hat_pobre_rfThresh_logit_elasticnet_upsample=ifelse(evalResults$Roc_logit_elasticnet_upsample>rfThresh_logit_elasticnet_upsample$threshold,"Si","No"),
-                                    hat_pobre_05_logit_elasticnet_upsample2=ifelse(evalResults$Roc_logit_elasticnet_upsample2>0.5,"Si","No"),
-                                    hat_pobre_rfThresh_logit_elasticnet_upsample2=ifelse(evalResults$Roc_logit_elasticnet_upsample2>rfThresh_logit_elasticnet_upsample2$threshold,"Si","No"),
-                                    hat_pobre_05_logit_lasso_downsample=ifelse(evalResults$Roc_logit_lasso_downsample>0.5,"Si","No"),
-                                    hat_pobre_rfThresh_logit_lasso_downsample=ifelse(evalResults$Roc_logit_lasso_downsample>rfThresh_logit_lasso_downsample$threshold,"Si","No"),
-                                    hat_pobre_05_logit_lasso_downsample2=ifelse(evalResults$Roc_logit_lasso_downsample2>0.5,"Si","No"),
-                                    hat_pobre_rfThresh_logit_lasso_downsample2=ifelse(evalResults$Roc_logit_lasso_downsample2>rfThresh_logit_lasso_downsample2$threshold,"Si","No"),
-                                    hat_pobre_05_logit_ridge_downsample=ifelse(evalResults$Roc_logit_ridge_downsample>0.5,"Si","No"),
-                                    hat_pobre_rfThresh_logit_ridge_downsample=ifelse(evalResults$Roc_logit_ridge_downsample>rfThresh_logit_ridge_downsample$threshold,"Si","No"),
-                                    hat_pobre_05_logit_ridge_downsample2=ifelse(evalResults$Roc_logit_ridge_downsample2>0.5,"Si","No"),
-                                    hat_pobre_rfThresh_logit_ridge_downsample2=ifelse(evalResults$Roc_logit_ridge_downsample2>rfThresh_logit_ridge_downsample2$threshold,"Si","No"))
+## Clasificación de la evaluación ##
 
 with(evalResults, table(Pobre, hat_pobre_05_logit))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit2))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit2))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_lasso))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_lasso))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_lasso2))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_lasso2))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_ridge))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_ridge))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_ridge2))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_ridge2))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_elasticnet))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_elasticnet))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_elasticnet2))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_elasticnet2))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_lasso_upsample))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_lasso_upsample))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_lasso_upsample2))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_lasso_upsample2))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_ridge_upsample))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_ridge_upsample))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_ridge_upsample2))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_ridge_upsample2))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_elasticnet_upsample))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_elasticnet_upsample))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_elasticnet_upsample2))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_elasticnet_upsample2))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_lasso_downsample))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_lasso_downsample))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_lasso_downsample2))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_lasso_downsample2))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_ridge_downsample))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_ridge_downsample))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_ridge_downsample2))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_ridge_downsample2))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_elasticnet_downsample))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_elasticnet_downsample))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_elasticnet_downsample2))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_elasticnet_downsample2))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_lasso_smote))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_lasso_smote))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_lasso_smote2))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_lasso_smote2))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_ridge_smote))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_ridge_smote))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_ridge_smote2))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_ridge_smote2))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_elasticnet_smote))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_elasticnet_smote))
 
 with(evalResults,table(Pobre,hat_pobre_05_logit_elasticnet_smote2))
-
 with(evalResults,table(Pobre,hat_pobre_rfThresh_logit_elasticnet_smote2))
 
 ### Modelo de árbol para clasificación ###
@@ -946,6 +924,8 @@ rpart.plot::prp(tree$finalModel)
 
 rpart.plot::prp(tree2$finalModel)
 
+## Random Forest ##
+
 set.seed(1410)
 
 forest <- train(
@@ -970,9 +950,11 @@ forest2 <- train(
 
 forest2
 
-varImp(forest,scale=TRUE)
+varImp(forest,scale=TRUE) #importancia de las variables
 
 varImp(forest2,scale=TRUE)
+
+## Adaboost ##
 
 set.seed(1410)
 
@@ -997,6 +979,9 @@ adaboost2 <- train(
 )
 
 adaboost2
+
+
+### 6. Predicciones sobre base de testing ###
 
 testResults <- data.frame(Pobre = testing$Pobre)
 
@@ -1186,6 +1171,8 @@ testResults<-testResults %>%
          logit_elasticnet_smote_thresh2=ifelse(logit_elasticnet_smote_thresh2>rfThresh_logit_elasticnet_smote2$threshold,"Si","No"),
   )
 
+# Predicciones para seleccionar modelo 
+
 pred_tree<-predict(tree,testX)
 
 pred_tree2<-predict(tree2,testX2)
@@ -1199,117 +1186,109 @@ pred_ada<-predict(adaboost,testing)
 pred_ada2<-predict(adaboost2,testing)
 
 with(testResults,table(Pobre,logit))
-
 with(testResults,table(Pobre,logit2))
 
 with(testResults,table(Pobre,logit_thresh))
-
 with(testResults,table(Pobre,logit_thresh2))
 
 with(testResults,table(Pobre,logit_lasso))
-
 with(testResults,table(Pobre,logit_lasso2))
 
 with(testResults,table(Pobre,logit_lasso_thresh))
-
 with(testResults,table(Pobre,logit_lasso_thresh2))
 
 with(testResults,table(Pobre,logit_ridge))
-
 with(testResults,table(Pobre,logit_ridge2))
 
 with(testResults,table(Pobre,logit_ridge_thresh))
-
 with(testResults,table(Pobre,logit_ridge_thresh2))
 
 with(testResults,table(Pobre,logit_elasticnet))
-
 with(testResults,table(Pobre,logit_elasticnet2))
 
 with(testResults,table(Pobre,logit_elasticnet_thresh))
-
 with(testResults,table(Pobre,logit_elasticnet_thresh2))
 
 with(testResults,table(Pobre,logit_lasso_upsample))
-
 with(testResults,table(Pobre,logit_lasso_upsample2))
 
 with(testResults,table(Pobre,logit_lasso_upsample_thresh))
-
 with(testResults,table(Pobre,logit_lasso_upsample_thresh2))
 
 with(testResults,table(Pobre,logit_ridge_upsample))
-
 with(testResults,table(Pobre,logit_ridge_upsample2))
 
 with(testResults,table(Pobre,logit_ridge_upsample_thresh))
-
 with(testResults,table(Pobre,logit_ridge_upsample_thresh2))
 
 with(testResults,table(Pobre,logit_elasticnet_upsample))
-
 with(testResults,table(Pobre,logit_elasticnet_upsample2))
 
 with(testResults,table(Pobre,logit_elasticnet_upsample_thresh))
-
 with(testResults,table(Pobre,logit_elasticnet_upsample_thresh2))
 
 with(testResults,table(Pobre,logit_lasso_downsample))
-
 with(testResults,table(Pobre,logit_lasso_downsample2))
 
 with(testResults,table(Pobre,logit_lasso_downsample_thresh))
-
 with(testResults,table(Pobre,logit_lasso_downsample_thresh2))
 
 with(testResults,table(Pobre,logit_ridge_downsample))
-
 with(testResults,table(Pobre,logit_ridge_downsample2))
 
 with(testResults,table(Pobre,logit_ridge_downsample_thresh))
-
 with(testResults,table(Pobre,logit_ridge_downsample_thresh2))
 
 with(testResults,table(Pobre,logit_elasticnet_downsample))
-
 with(testResults,table(Pobre,logit_elasticnet_downsample2))
 
 with(testResults,table(Pobre,logit_elasticnet_downsample_thresh))
-
 with(testResults,table(Pobre,logit_elasticnet_downsample_thresh2))
 
 with(testResults,table(Pobre,logit_lasso_smote))
-
 with(testResults,table(Pobre,logit_lasso_smote2))
 
 with(testResults,table(Pobre,logit_lasso_smote_thresh))
-
 with(testResults,table(Pobre,logit_lasso_smote_thresh2))
 
 with(testResults,table(Pobre,logit_ridge_smote))
-
 with(testResults,table(Pobre,logit_ridge_smote2))
 
 with(testResults,table(Pobre,logit_ridge_smote_thresh))
-
 with(testResults,table(Pobre,logit_ridge_smote_thresh2))
 
 with(testResults,table(Pobre,logit_elasticnet_smote))
-
 with(testResults,table(Pobre,logit_elasticnet_smote2))
 
 with(testResults,table(Pobre,logit_elasticnet_smote_thresh))
-
 with(testResults,table(Pobre,logit_elasticnet_smote_thresh2))
 
 confusionMatrix(testing$Pobre,pred_tree)
-
 confusionMatrix(testing$Pobre,pred_tree2)
 
 confusionMatrix(testing$Pobre,pred_rf)
-
 confusionMatrix(testing$Pobre,pred_rf2)
 
 confusionMatrix(testing$Pobre,pred_ada)
-
 confusionMatrix(testing$Pobre,pred_ada2)
+865
+##=== 6. submit ===##
+
+## data test
+data_submit <- import("df_test_hogares.rds")
+
+## prediction
+data_submit$prediction <- predict(logit_elasticnet_upsample2, data_submit , type="prob")[,1]
+
+data_submit = data_submit %>% mutate(clasification_model=ifelse(prediction>=0.5,1,0))
+
+submit = data_submit %>% select(id,clasification_model)
+
+prop.table(table(submit$clasification_model))
+
+## export results
+saveRDS(submit, file = "clasification_model_submit.rds")
+
+
+
+
