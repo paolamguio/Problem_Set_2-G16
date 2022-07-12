@@ -104,34 +104,46 @@ model2 <- as.formula("Ingtotugarr ~ tipo_vivienda + Dominio + Nro_personas_cuart
 
 
 
-fiveStats <- function(...) c(twoClassSummary(...), defaultSummary(...))
+#fiveStats <- function(...) c(twoClassSummary(...), defaultSummary(...))
 
 ### 5. Modelos de predicción ###
+
+### 5.1 Modelo Lineal
+
 set.seed(777)
-setControl <- trainControl(
-  method = "cv", ## Metodo de resampling
-  number = 10, ## Numero de particiones
-  verboseIter = TRUE ## Para imprimir el log de entrenamiento
-)
+
+#Controles y Evaluaciones
+
 ctrl_lineal<- trainControl(
-                    method = "cv", ## Metodo de resampling
-                    number = 5, ## Numero de particiones
-                    verboseIter = TRUE ## Para imprimir el log de entrenamiento
-                    )
+  method = "cv", ## Metodo de resampling
+  number = 5, ## Numero de particiones
+  verboseIter = FALSE ## Para imprimir el log de entrenamiento
+)
 
 ctrl<- trainControl(method = "cv",
                     number = 5,
-                    summaryFunction = fiveStats,
-                    classProbs = TRUE,
+                    #summaryFunction = fiveStats,
+                    #classProbs = TRUE,
                     verbose=FALSE,
                     savePredictions = T)
 
+eval_results <- function(true, predicted, df) {
+  SSE <- sum((predicted - true)^2)
+  SST <- sum((true - mean(true))^2)
+  R_square <- 1 - SSE / SST
+  RMSE = sqrt(SSE/nrow(df))
+  
+  
+  # Medtricas del cumplimiento del model
+  data.frame(
+    RMSE = RMSE,
+    Rsquare = R_square
+  )}
 
-## 5.1. Modelo Logit - datos de entrenamiento ###
-
+## 5.1. Modelo Lineal - datos de entrenamiento ###
 
 lineal1 <- train(
-  model,
+  model1,
   data = training,
   method = "lm",
   trControl = ctrl_lineal,
@@ -149,91 +161,52 @@ lineal2 <- train(
 lineal1
 lineal2
 
-eval_results <- function(true, predicted, df) {
-  SSE <- sum((predicted - true)^2)
-  SST <- sum((true - mean(true))^2)
-  R_square <- 1 - SSE / SST
-  RMSE = sqrt(SSE/nrow(df))
-  
-  
-  # Model performance metrics
-  data.frame(
-    RMSE = RMSE,
-    Rsquare = R_square
-  )
-  
-}
+predLineal1 <- predict(lineal1 , testing)
+predLineal2 <- predict(lineal2 , testing)
 
+eval_results(testing$Ingtotugarr,predLineal1,testing)
+eval_results(testing$Ingtotugarr,predLineal2,testing)
+
+## Clasificacion
+testing <- testing %>%mutate(linealLP1=ifelse(predLineal1/Nper < Lp, 1, 0))
+testing<-testing %>% mutate(linealLP1=factor(linealLP1,levels=c(1,0),labels=c("Si","No")))
+
+testing <- testing %>%mutate(linealLP2=ifelse(predLineal2/Nper < Lp, 1, 0))
+testing<-testing %>% mutate(linealLP2=factor(linealLP2,levels=c(1,0),labels=c("Si","No")))
+
+confusionMatrix(data=testing$linealLP1, 
+                reference=testing$ingmenorLP , 
+                mode="sens_spec" , positive="Si")
+confusionMatrix(data=testing$linealLP2, 
+                reference=testing$ingmenorLP , 
+                mode="sens_spec" , positive="Si")
+
+
+#dibujar los modelos
 model_list = list(mod1=lineal1,
                   mod2=lineal2)
 resamples <- resamples(model_list)
 dotplot(resamples,metric = "RMSE")
 
-## predict
-pred1 <- predict(lineal1 , testing)
-pred2 <- predict(lineal2 , testing)
 
-MSE_lineal1 <- with (testing,mean((Ingtotugarr - pred1)^2))
-MSE_lineal2 <- with (testing,mean((Ingtotugarr - pred2)^2))
-
-eval_results(testing$Ingtotugarr,pred1,testing)
-eval_results(testing$Ingtotugarr,pred2,testing)
-
-
-MSE_lineal1
-MSE_lineal2
-
-## ROC
-pred <- prediction(testing$p_caret , testing$Ingtotugarr)
-
-roc_ROCR <- performance(pred,"tpr","fpr")
-
-plot(roc_ROCR, main = "ROC curve", colorize = T)
-abline(a = 0, b = 1)
-
-auc_roc = performance(pred, measure = "auc")
-auc_roc@y.values[[1]]
-
-##===optimal cutoff ===##
-
-evalResults <- data.frame(ingresomenorLP = evaluation$ingmenorLP)
-
-
-evalResults$Roc <- predict(logit, newdata = evaluation,
-                           type = "prob")[,1]
-
-rfROC <- roc(evalResults$ingmenorLP, evalResults$Roc, levels = rev(levels(evalResults$ingmenorLP)))
-
-rfROC
-
-rfThresh <- coords(rfROC, x = "best", best.method = "closest.topleft")
-
-rfThresh
-
-
-## 4.2. Modelo lasso - datos de entrenamiento ###
+## 5.2. Modelo lasso - datos de entrenamiento ###
 
 lambda_grid <- 10^seq(-4, 0.01, length = 300)
 
 set.seed(777)
 
-lineal_lasso <- train(
+lasso1 <- train(
   model1,
   data = training,
   method = "glmnet",
   trControl = ctrl,
-  metric = "MSE",
+  metric = "RMSE",
   tuneGrid = expand.grid(alpha = 0,lambda=lambda_grid),
   preProcess = c("center", "scale")
 )
+lasso1
 
-lineal_lasso
-
-pred1<-predict(lineal_lasso,testing)
-
-eval_results(testing$Ingtotugarr,pred1,testing)
-
-logit_lasso2 <- train(
+lasso2 <- train(
   model2,
   data = training,
   method = "glmnet",
@@ -243,12 +216,31 @@ logit_lasso2 <- train(
   preProcess = c("center", "scale")
 )
 
-logit_lasso2
+predLasso1<-predict(lasso1,testing)
+predLasso2<-predict(lasso2,testing)
 
-## 4.3. Modelo logit ridge - datos de entrenamiento ###
+eval_results(testing$Ingtotugarr,predLasso1,testing)
+eval_results(testing$Ingtotugarr,predLasso2,testing)
 
-lineal_ridge <- train(
-  model,
+## Clasificacion
+testing <- testing %>%mutate(lassoLP1=ifelse(predLasso1/Nper < Lp, 1, 0))
+testing<-testing %>% mutate(lassoLP1=factor(lassoLP1,levels=c(1,0),labels=c("Si","No")))
+
+testing <- testing %>%mutate(lassoLP2=ifelse(predLasso2/Nper < Lp, 1, 0))
+testing<-testing %>% mutate(lassoLP2=factor(lassoLP2,levels=c(1,0),labels=c("Si","No")))
+
+
+confusionMatrix(data=testing$lassoLP1, 
+                reference=testing$ingmenorLP , 
+                mode="sens_spec" , positive="Si")
+confusionMatrix(data=testing$lassoLP2, 
+                reference=testing$ingmenorLP , 
+                mode="sens_spec" , positive="Si")
+
+## 5.3. Modelo logit ridge - datos de entrenamiento ###
+
+ridge1 <- train(
+  model1,
   data = training,
   method = "glmnet",
   trControl = ctrl,
@@ -257,13 +249,7 @@ lineal_ridge <- train(
   preProcess = c("center", "scale")
 )
 
-lineal_ridge
-
-pred1<-predict(lineal_ridge,testing)
-
-eval_results(testing$Ingtotugarr,pred1,testing)
-
-logit_ridge2 <- train(
+ridge2 <- train(
   model2,
   data = training,
   method = "glmnet",
@@ -274,9 +260,27 @@ logit_ridge2 <- train(
   preProcess = c("center", "scale")
 )
 
-logit_ridge2
+predRidge1<-predict(ridge1,testing)
+predRidge2<-predict(ridge2,testing)
 
-logit_elasticnet <- train(
+eval_results(testing$Ingtotugarr,predRidge1,testing)
+eval_results(testing$Ingtotugarr,predRidge2,testing)
+
+## Clasificacion
+testing <- testing %>%mutate(ridgeLP1=ifelse(predRidge1/Nper < Lp, 1, 0))
+testing<-testing %>% mutate(ridgeLP1=factor(ridgeLP1,levels=c(1,0),labels=c("Si","No")))
+
+testing <- testing %>%mutate(ridgeLP2=ifelse(predRidge2/Nper < Lp, 1, 0))
+testing<-testing %>% mutate(ridgeLP2=factor(ridgeLP2,levels=c(1,0),labels=c("Si","No")))
+
+confusionMatrix(data=testing$ridgeLP1, 
+                reference=testing$ingmenorLP , 
+                mode="sens_spec" , positive="Si")
+confusionMatrix(data=testing$ridgeLP2, 
+                reference=testing$ingmenorLP , 
+                mode="sens_spec" , positive="Si")
+
+elasticnet1 <- train(
   model1,
   data = training,
   method = "glmnet",
@@ -285,15 +289,8 @@ logit_elasticnet <- train(
   preProcess = c("center", "scale")
 )
 
-logit_elasticnet
 
-
-
-pred1<-predict(logit_elasticnet,testing)
-
-eval_results(testing$Ingtotugarr,pred1,testing)
-
-logit_elasticnet2 <- train(
+elasticnet2 <- train(
   model2,
   data = training,
   method = "glmnet",
@@ -303,7 +300,7 @@ logit_elasticnet2 <- train(
   preProcess = c("center", "scale")
 )
 
-logit_elasticnet2
+
 
 ## 4.4. Modelo logit lasso up sample - datos de entrenamiento ###
 
