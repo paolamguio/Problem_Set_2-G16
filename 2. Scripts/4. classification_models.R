@@ -960,7 +960,7 @@ set.seed(1410)
 
 adaboost <- train(
   model,
-  data = upSampledTrain,
+  data = training,
   method = "adaboost",
   trControl = ctrl,
   family = "binomial",
@@ -971,7 +971,7 @@ adaboost
 
 adaboost2 <- train(
   model2,
-  data = upSampledTrain,
+  data = training,
   method = "adaboost",
   trControl = ctrl,
   family = "binomial",
