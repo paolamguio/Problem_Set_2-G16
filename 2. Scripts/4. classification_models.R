@@ -1277,6 +1277,19 @@ confusionMatrix(testing$Pobre,pred_ada2)
 ## data test
 data_submit <- import("df_test_hogares.rds")
 
+df_coeficientes <- coef(logit_elasticnet_upsample2) %>%
+  as.matrix() %>%
+  as_tibble(rownames = "predictor") %>%
+  rename(coeficiente = s0)
+
+df_coeficientes %>%
+  filter(predictor != "(Intercept)") %>%
+  ggplot(aes(x = predictor, y = coeficiente)) +
+  geom_col() +
+  labs(title = "Coeficientes del modelo Elasticnet Upsample") +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 6, angle = 45))
+
 ## prediction
 data_submit$prediction <- predict(logit_elasticnet_upsample2, data_submit , type="prob")[,1]
 
