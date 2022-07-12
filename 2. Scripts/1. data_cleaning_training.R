@@ -1,5 +1,5 @@
 
-# Data Cleaning
+# Data Cleaning Base Training
 # Problem_Set_2 
 # Grupo 16
 # Andres Martinez, Paola Morales y Oscar Cortes 
@@ -25,7 +25,7 @@ p_load(
   gtsummary
 )
 
-### 1. llamado base de datos ###
+### 1. llamado bases de datos ###
 df_hogares <- import("train_hogares.Rds")
 df_personas <- import("train_personas.Rds")
 df_test_hogares <- import("test_hogares.Rds")
@@ -41,7 +41,7 @@ summary(df_personas)
 summary(df_test_hogares)
 summary(df_test_personas)
 
-### 2. limpieza base de datos ###
+### 2. Generación de variables que se van a utilizar de la base personas ###
 
 df_personas <- df_personas %>% select(colnames(df_test_personas), Ingtotob)
 colnames(df_personas)
@@ -70,7 +70,6 @@ df_personas <- df_personas %>% mutate(edu = case_when(P6210 == 1 ~ 0,
 
 summary(df_personas$edu)
 
-# creación de variables
 df_personas <- df_personas %>% mutate(trabajo_formal = ifelse(P6920 == 1, 1, 0))
 df_personas <- df_personas %>% mutate(segundo_trabajo = ifelse(P7040 == 1, 1, 0))
 df_personas <- df_personas %>% mutate(arriendos = ifelse(P7495 == 1, 1, 0))
@@ -81,6 +80,8 @@ df_personas <- df_personas %>% mutate(otros_ingresos_pais = ifelse(P7510s1 == 1,
 df_personas <- df_personas %>% mutate(otros_ingresos_otros_paises = ifelse(P7510s2 == 1, 1, 0))
 df_personas <- df_personas %>% mutate(otros_ingresos_instituciones = ifelse(P7510s3 == 1, 1, 0))
 df_personas <- df_personas %>% mutate(otras_ganancias = ifelse(P7510s5 == 1, 1, 0))
+
+## Se agrupa la información de la base personas por hogar para unirla con la base de hogar
 df_hogares2<-df_personas %>% group_by(id) %>% summarize(Nro_mujeres=sum(female,na.rm = TRUE),
                                                         edad_promedio=mean(P6040,na.rm = TRUE),
                                                         jefe_hogar_mujer=sum(jefe_hogar_mujer,na.rm = TRUE),
@@ -114,6 +115,8 @@ df_hogares<-df_hogares %>% mutate(tipo_vivienda=factor(P5090,levels=c(1, 2, 3, 4
 están pagando", "En arriendo o
 subarriendo", "En usufructo", "Posesión sin
 titulo", "Otra")))
+
+## se crean variables adicionales en la base de hogar 
 df_hogares <- df_hogares %>% mutate(Nro_cuartos = P5000)
 df_hogares <- df_hogares %>% mutate(Nro_personas_cuartos = Nper/P5010)
 df_hogares <- df_hogares %>% mutate(cuota_amortizacion = P5100)
@@ -123,5 +126,39 @@ summary(df_hogares)
 
 df_hogares <- left_join(df_hogares, df_hogares2)
 
-### 3. base de datos final ###
+### 3. ajuste de variables a utilizar en los modelos ###
+df_hogares <- df_hogares %>% mutate(Dominio = factor(Dominio))
+df_hogares <- df_hogares %>% mutate(porcentaje_mujeres = Nro_mujeres/Nper,
+                                    porcentaje_trabajo_formal = Nro_personas_trabajo_formal/Nro_personas_ocupadas,
+                                    porcentaje_subsidio_familiar = Nro_personas_subsidio_familiar/Nper,
+                                    segundo_trabajo = ifelse(Nro_personas_segundo_trabajo == 0, 0, 1),
+                                    otros_ingresos = ifelse(Nro_personas_arriendos == 0 & Nro_personas_pensiones == 0 & Nro_personas_pension_alimenticia == 0 & Nro_personas_otros_ingresos == 0 & Nro_personas_otros_ingresos_pais == 0 & Nro_personas_otros_ingresos_otros_paises == 0 & Nro_personas_otras_ganancias == 0, 0, 1),
+                                    otros_ingresos_instituciones = ifelse(Nro_personas_otros_ingresos_instituciones == 0, 0, 1),
+                                    tasa_ocupacion = Nro_personas_ocupadas/Nro_personas_PET,
+                                    tasa_desempleo = Nro_personas_desempleadas/(Nro_personas_PET - Nro_personas_inactivas),
+                                    tasa_inactivas = Nro_personas_inactivas/Nro_personas_PET,
+                                    tasa_participacion = (Nro_personas_PET - Nro_personas_inactivas)/Nro_personas_PET)
+
+summary(df_hogares)
+
+### 4. ajuste de missing values ###
+df_hogares <- df_hogares %>% replace_with_na(replace = list(Nro_cuartos = 98))
+df_hogares <- df_hogares %>% mutate(cuota_amortizacion = ifelse(is.na(cuota_amortizacion) == T, 0, cuota_amortizacion),
+                                    arriendo = ifelse(is.na(arriendo) == T, 0, arriendo),
+                                    horas_trabajadas_promedio = ifelse(is.na(horas_trabajadas_promedio) == T, 0, horas_trabajadas_promedio),
+                                    porcentaje_trabajo_formal = ifelse(is.na(porcentaje_trabajo_formal) == T, 0, porcentaje_trabajo_formal),
+                                    tasa_desempleo = ifelse(is.na(tasa_desempleo) == T, 0, tasa_desempleo))
+
+df_hogares <- df_hogares %>% subset(is.na(Nro_cuartos) == F)
+df_hogares <- df_hogares %>% subset(is.na(edu_promedio) == F)
+
+colnames(df_hogares)
+
+# selección variables de interes 
+df_hogares <- df_hogares %>% select(c("id", "Clase", "Dominio", "Nper", "Li", "Lp", "Pobre", "Npobres", "tipo_vivienda", "Nro_cuartos", "Nro_personas_cuartos", "cuota_amortizacion", "arriendo", "Nro_mujeres", "edad_promedio", "jefe_hogar_mujer", "Nro_hijos", "Nro_personas_trabajo_formal", "edu_promedio", "Nro_personas_subsidio_familiar", "horas_trabajadas_promedio", "Nro_personas_arriendos", "Nro_personas_pensiones", "Nro_personas_pension_alimenticia", "Nro_personas_otros_ingresos", "Nro_personas_otros_ingresos_pais", "Nro_personas_otros_ingresos_otros_paises", "Nro_personas_otros_ingresos_instituciones", "Nro_personas_otras_ganancias", "Nro_personas_PET", "Nro_personas_ocupadas", "Nro_personas_desempleadas", "Nro_personas_inactivas", "Ingtotob_hogar", "porcentaje_mujeres", "porcentaje_trabajo_formal", "porcentaje_subsidio_familiar", "segundo_trabajo", "otros_ingresos", "otros_ingresos_instituciones", "tasa_ocupacion", "tasa_desempleo", "tasa_inactivas", "tasa_participacion"))
+
+summary(df_hogares)
+
+### 5. base de datos final ###
 saveRDS(df_hogares, file = "df_hogares.rds")
+
