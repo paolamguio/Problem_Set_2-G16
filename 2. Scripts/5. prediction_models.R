@@ -437,66 +437,117 @@ testing<-testing %>% mutate(elasticnetDownsampleLP1=factor(elasticnetDownsampleL
 
 
 ### 6. Evaluación de resultados ###
-tabla<-matrix(rep(0,21),nrow=7,ncol=3)
-colnames(MSE)<- c("Modelo","MSE","MSE_k-fold")
-#modelo 1
-model1 <- lm(logingtot~1, data = train)
-summary(model1)
-coef(model1)
-mean(train$y_total_m)
-test$model1<-predict(model1,newdata = test)
-MSE[1,1]<-1
-MSE[1,2]<- with(test,mean((logingtot-model1)^2))
+tabla<-matrix(rep(0,40),nrow=10,ncol=4)
+colnames(tabla)<- c("Modelo","RMSE","Sens","Spec")
+#Lineal
+tabla[1,1]<-"OLS"
+eval<-eval_results(testing$Ingtotugarr,predLineal1,testing)
+tabla[1,2]<-eval$RMSE
+matriz<-confusionMatrix(data=testing$linealLP1, 
+                        reference=testing$Pobre , 
+                        mode="sens_spec" , positive="Si")
+tabla[1,3]<-matriz$byClass[1]
+tabla[1,4]<-matriz$byClass[2]
 
-eval_results(testing$Ingtotugarr,predLineal1,testing)
-confusionMatrix(data=testing$linealLP1, 
-                reference=testing$Pobre , 
-                mode="sens_spec" , positive="Si")
 
-eval_results(testing$Ingtotugarr,predLasso1,testing)
-confusionMatrix(data=testing$lassoLP1, 
-                reference=testing$Pobre , 
-                mode="sens_spec" , positive="Si")
+#Lasso
+tabla[2,1]<-"Lasso"
+eval<-eval_results(testing$Ingtotugarr,predLasso1,testing)
+tabla[2,2]<-eval$RMSE
+matriz<-confusionMatrix(data=testing$lassoLP1, 
+                        reference=testing$Pobre , 
+                        mode="sens_spec" , positive="Si")
+tabla[2,3]<-matriz$byClass[1]
+tabla[2,4]<-matriz$byClass[2]
 
-eval_results(testing$Ingtotugarr,predRidge1,testing)
-confusionMatrix(data=testing$ridgeLP1, 
-                reference=testing$Pobre , 
-                mode="sens_spec" , positive="Si")
 
-eval_results(testing$Ingtotugarr,predElasticnet1,testing)
-confusionMatrix(data=testing$elasticnetLP1, 
-                reference=testing$Pobre , 
-                mode="sens_spec" , positive="Si")
+#Ridge
+tabla[3,1]<-"Ridge"
+eval<-eval_results(testing$Ingtotugarr,predRidge1,testing)
+tabla[3,2]<-eval$RMSE
+matriz<-confusionMatrix(data=testing$ridgeLP1, 
+                        reference=testing$Pobre , 
+                        mode="sens_spec" , positive="Si")
+tabla[3,3]<-matriz$byClass[1]
+tabla[3,4]<-matriz$byClass[2]
 
-eval_results(testing$Ingtotugarr,predlassoUpsample1 ,testing)
-confusionMatrix(data=testing$lassoUpsampleLP1, 
-                reference=testing$Pobre , 
-                mode="sens_spec" , positive="Si")
+#Elasticnet
+tabla[4,1]<-"Elasticnet"
+eval<-eval_results(testing$Ingtotugarr,predElasticnet1,testing)
+tabla[4,2]<-eval$RMSE
+matriz<-confusionMatrix(data=testing$elasticnetLP1, 
+                        reference=testing$Pobre , 
+                        mode="sens_spec" , positive="Si")
+tabla[4,3]<-matriz$byClass[1]
+tabla[4,4]<-matriz$byClass[2]
 
-eval_results(testing$Ingtotugarr,predridgeUpsample1 ,testing)
-confusionMatrix(data=testing$ridgeUpsampleLP1, 
-                reference=testing$Pobre , 
-                mode="sens_spec" , positive="Si")
 
-eval_results(testing$Ingtotugarr,predelasticnetUpsample1 ,testing)
-confusionMatrix(data=testing$elasticnetUpsampleLP1, 
-                reference=testing$Pobre , 
-                mode="sens_spec" , positive="Si")
+#Lasso Upsample
+tabla[5,1]<-"Lasso_Upsample"
+eval<-eval_results(testing$Ingtotugarr,predlassoUpsample1 ,testing)
+tabla[5,2]<-eval$RMSE
+matriz<-confusionMatrix(data=testing$lassoUpsampleLP1, 
+                        reference=testing$Pobre , 
+                        mode="sens_spec" , positive="Si")
+tabla[5,3]<-matriz$byClass[1]
+tabla[5,4]<-matriz$byClass[2]
 
-eval_results(testing$Ingtotugarr,predlassoDownsample1 ,testing)
-confusionMatrix(data=testing$lassoDownsampleLP1, 
-                reference=testing$Pobre , 
-                mode="sens_spec" , positive="Si")
 
-eval_results(testing$Ingtotugarr,predridgeDownsample1 ,testing)
-confusionMatrix(data=testing$ridgeDownsampleLP1, 
-                reference=testing$Pobre , 
-                mode="sens_spec" , positive="Si")
+#Ridge Upsample
+tabla[6,1]<-"Ridge_Upsample"
+eval<-eval_results(testing$Ingtotugarr,predridgeUpsample1 ,testing)
+tabla[6,2]<-eval$RMSE
+matriz<-confusionMatrix(data=testing$ridgeUpsampleLP1, 
+                        reference=testing$Pobre , 
+                        mode="sens_spec" , positive="Si")
+tabla[6,3]<-matriz$byClass[1]
+tabla[6,4]<-matriz$byClass[2]
 
-eval_results(testing$Ingtotugarr,predelasticnetDownsample1 ,testing)
-confusionMatrix(data=testing$elasticnetDownsampleLP1, 
-                          reference=testing$Pobre , 
-                          mode="sens_spec" , positive="Si")
+
+#Elasticnet Upsample
+tabla[7,1]<-"Elasticnet_Upsample"
+eval<-eval_results(testing$Ingtotugarr,predelasticnetUpsample1 ,testing)
+tabla[7,2]<-eval$RMSE
+matriz<-confusionMatrix(data=testing$elasticnetUpsampleLP1, 
+                        reference=testing$Pobre , 
+                        mode="sens_spec" , positive="Si")
+tabla[7,3]<-matriz$byClass[1]
+tabla[7,4]<-matriz$byClass[2]
+
+
+#Lasso Downsample
+tabla[8,1]<-"Lasso_Downsample"
+eval<-eval_results(testing$Ingtotugarr,predlassoDownsample1 ,testing)
+tabla[8,2]<-eval$RMSE
+matriz<-confusionMatrix(data=testing$lassoDownsampleLP1, 
+                        reference=testing$Pobre , 
+                        mode="sens_spec" , positive="Si")
+tabla[8,3]<-matriz$byClass[1]
+tabla[8,4]<-matriz$byClass[2]
+
+
+#Ridge Downsample
+tabla[9,1]<-"Ridge_Downsample"
+eval<-eval_results(testing$Ingtotugarr,predridgeDownsample1 ,testing)
+tabla[9,2]<-eval$RMSE
+matriz<-confusionMatrix(data=testing$ridgeDownsampleLP1, 
+                        reference=testing$Pobre , 
+                        mode="sens_spec" , positive="Si")
+tabla[9,3]<-matriz$byClass[1]
+tabla[9,4]<-matriz$byClass[2]
+
+
+#Elasticnet Downsample
+tabla[10,1]<-"Elasticnet_Downsample"
+eval<-eval_results(testing$Ingtotugarr,predelasticnetDownsample1 ,testing)
+tabla[10,2]<-eval$RMSE
+matriz<-confusionMatrix(data=testing$elasticnetDownsampleLP1, 
+                        reference=testing$Pobre , 
+                        mode="sens_spec" , positive="Si")
+tabla[10,3]<-matriz$byClass[1]
+tabla[10,4]<-matriz$byClass[2]
+
+
 
 
 #dibujar los modelos
