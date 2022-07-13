@@ -212,7 +212,7 @@ logit_elasticnet2
 
 set.seed(1410)
 
-lambda_grid <- 10^seq(-4, 0.01, length = 100)
+lambda_grid <- 10^seq(-4, 0.01, length = 300)
 
 upSampledTrain <- upSample(x = training,
                            y = training$Pobre,
@@ -954,33 +954,6 @@ varImp(forest,scale=TRUE) #importancia de las variables
 
 varImp(forest2,scale=TRUE)
 
-## Adaboost ##
-
-set.seed(1410)
-
-adaboost <- train(
-  model,
-  data = training,
-  method = "adaboost",
-  trControl = ctrl,
-  family = "binomial",
-  metric = "Sens"
-)
-
-adaboost
-
-adaboost2 <- train(
-  model2,
-  data = training,
-  method = "adaboost",
-  trControl = ctrl,
-  family = "binomial",
-  metric = "Sens"
-)
-
-adaboost2
-
-
 ### 6. Predicciones sobre base de testing ###
 
 testResults <- data.frame(Pobre = testing$Pobre)
@@ -1181,10 +1154,6 @@ pred_rf<-predict(forest,testing)
 
 pred_rf2<-predict(forest2,testing)
 
-pred_ada<-predict(adaboost,testing)
-
-pred_ada2<-predict(adaboost2,testing)
-
 with(testResults,table(Pobre,logit))
 with(testResults,table(Pobre,logit2))
 
@@ -1269,18 +1238,17 @@ confusionMatrix(testing$Pobre,pred_tree2)
 confusionMatrix(testing$Pobre,pred_rf)
 confusionMatrix(testing$Pobre,pred_rf2)
 
-confusionMatrix(testing$Pobre,pred_ada)
-confusionMatrix(testing$Pobre,pred_ada2)
-865
 ##=== 6. submit ===##
 
 ## data test
 data_submit <- import("df_test_hogares.rds")
 
-df_coeficientes <- coef(logit_elasticnet_upsample2) %>%
+df_coeficientes <- coef(logit_elasticnet_upsample2$finalModel, c(logit_elasticnet_upsample2$finalModel$lambdaOpt, logit_elasticnet_upsample2$finalModel$a0)) %>%
   as.matrix() %>%
   as_tibble(rownames = "predictor") %>%
   rename(coeficiente = s0)
+
+write_xlsx(df_coeficientes, "coeficientes.xlsx") # se exporta a excel tabla con las estadísticas descriptivas
 
 df_coeficientes %>%
   filter(predictor != "(Intercept)") %>%
