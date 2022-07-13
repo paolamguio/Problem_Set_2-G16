@@ -30,7 +30,8 @@ p_load(
   smotefamily,
   rpart,
   randomForest,
-  fastAdaboost
+  fastAdaboost,
+  stargazer
 )
 
 ### 1. llamado base de datos creada en 2.data_cleaning2.R ###
@@ -547,8 +548,9 @@ matriz<-confusionMatrix(data=testing$elasticnetDownsampleLP1,
 tabla[10,3]<-matriz$byClass[1]
 tabla[10,4]<-matriz$byClass[2]
 
-
-
+dtabla<-as.data.frame(tabla)
+stargazer(tabla, type = "text")
+write_xlsx(dtabla,"tabla_ingreso.xlsx")
 
 #dibujar los modelos
 model_list = list(modLin=lineal1,
